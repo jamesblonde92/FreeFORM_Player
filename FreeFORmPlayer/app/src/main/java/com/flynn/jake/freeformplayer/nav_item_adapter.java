@@ -43,8 +43,25 @@ public class nav_item_adapter extends ArrayAdapter<DrawerItem> {
 
             DrawerItem choice = drawerItems.get(position);
 
-            imageView.setImageResource(R.drawable.logo);
+
             textView.setText(choice.getTitle());
+
+            if(choice.getId() == R.drawable.all_songs){
+                imageView.setImageResource(R.drawable.all_songs);
+
+            }
+            else if(choice.getId() == R.drawable.artist){
+                imageView.setImageResource(R.drawable.artist);
+
+            }
+            else if(choice.getId() == R.drawable.now_playing){
+                imageView.setImageResource(R.drawable.now_playing);
+
+            }
+            else if(choice.getId() == R.drawable.settings){
+                imageView.setImageResource(R.drawable.settings);
+
+            }
 
             return v;
 

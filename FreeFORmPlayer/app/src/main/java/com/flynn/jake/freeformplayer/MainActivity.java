@@ -41,10 +41,10 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
         mDrawerItemArrayList = new ArrayList<DrawerItem>();
-        mDrawerItemArrayList.add(new DrawerItem(R.drawable.logo, "test1"));
-        mDrawerItemArrayList.add(new DrawerItem(R.drawable.logo, "test2"));
-        mDrawerItemArrayList.add(new DrawerItem(R.drawable.logo, "test3"));
-        mDrawerItemArrayList.add(new DrawerItem(R.drawable.logo, "test4"));
+        mDrawerItemArrayList.add(new DrawerItem(R.drawable.all_songs, " All Songs"));
+        mDrawerItemArrayList.add(new DrawerItem(R.drawable.artist, " Artist"));
+        mDrawerItemArrayList.add(new DrawerItem(R.drawable.now_playing, " Now Playing"));
+        mDrawerItemArrayList.add(new DrawerItem(R.drawable.settings, " Settings"));
         mDrawerItemArrayList.trimToSize();
 
 
