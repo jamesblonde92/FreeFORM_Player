@@ -23,7 +23,7 @@ public final class MediaContract {
     //------End Media Table--------//
 
     //------Song Tables--------//
-    public static abstract class Songs implements BaseColumns {
+    public static abstract class SongAttributes implements BaseColumns {
         public static final String SONG_TABLE = "Songs";
         public static final String COLUMN_FOREIGN_KEY_MEDIA = "MediaId";
         public static final String COLUMN_SONGS_NAME = "SongName";

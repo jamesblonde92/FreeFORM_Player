@@ -29,13 +29,13 @@ public class MediaSQLightHelper extends SQLiteOpenHelper {
             MediaContract.MediaInfo.COLUMN_MEDIA_FORMAT + " TEXT)";
 
     private static String CREATE_SONGS =
-            "CREATE TABLE" + MediaContract.Songs.SONG_TABLE + "(" +
+            "CREATE TABLE" + MediaContract.SongAttributes.SONG_TABLE + "(" +
             BaseColumns._ID + "INTEGER PRIMARY KEY AUTOINCREMENT," +
-            MediaContract.Songs.COLUMN_SONGS_NAME + " TEXT," +
-            MediaContract.Songs.COLUMN_SONGS_GENRE + " TEXT," +
-            MediaContract.Songs.COLUMN_SONGS_ARTIST + " TEXT," +
-            MediaContract.Songs.COLUMN_SONGS_LENGTH + " INTEGER," +
-            "FOREIGN KEY(" + MediaContract.Songs.COLUMN_FOREIGN_KEY_MEDIA + ") REFERENCES MediaInfo(_ID)";
+            MediaContract.SongAttributes.COLUMN_SONGS_NAME + " TEXT," +
+            MediaContract.SongAttributes.COLUMN_SONGS_GENRE + " TEXT," +
+            MediaContract.SongAttributes.COLUMN_SONGS_ARTIST + " TEXT," +
+            MediaContract.SongAttributes.COLUMN_SONGS_LENGTH + " INTEGER," +
+            "FOREIGN KEY(" + MediaContract.SongAttributes.COLUMN_FOREIGN_KEY_MEDIA + ") REFERENCES MediaInfo(_ID)";
 
     private static String CREATE_ALBUMS =
             "CREATE TABLE" + MediaContract.Albums.ALBUM_TABLE + "(" +
@@ -43,14 +43,14 @@ public class MediaSQLightHelper extends SQLiteOpenHelper {
             MediaContract.Albums.COLUMN_ALBUM_NAME + " TEXT," +
             MediaContract.Albums.COLUMN_ALBUM_YEAR + " INTEGER," +
             MediaContract.Albums.COLUMN_ALBUM_ARTIST + " TEXT," +
-            "FOREIGN KEY(" + MediaContract.Albums.COLUMN_FOREIGN_KEY_SONGS + ") REFERENCES Songs(_ID)";
+            "FOREIGN KEY(" + MediaContract.Albums.COLUMN_FOREIGN_KEY_SONGS + ") REFERENCES SongAttributes(_ID)";
 
     private static String CREATE_ART =
             "CREATE TABLE" + MediaContract.SongArt.ART_TABLE + "(" +
             BaseColumns._ID + "INTEGER PRIMARY KEY AUTOINCREMENT," +
             MediaContract.SongArt.COLUMN_ART_HEIGHT + " INTEGER," +
             MediaContract.SongArt.COLUMN_ART_WIDTH + " INTEGER," +
-            "FOREIGN KEY(" + MediaContract.SongArt.COLUMN_FOREIGN_KEY_SONGS + ") REFERENCES Songs(_ID)";
+            "FOREIGN KEY(" + MediaContract.SongArt.COLUMN_FOREIGN_KEY_SONGS + ") REFERENCES SongAttributes(_ID)";
 
     private static String CREATE_VIDEOS =
             "CREATE TABLE" + MediaContract.Videos.VIDEO_TABLE + "(" +
