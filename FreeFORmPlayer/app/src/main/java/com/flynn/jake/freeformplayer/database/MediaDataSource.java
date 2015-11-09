@@ -85,7 +85,7 @@ public class MediaDataSource {
         long albumID = database.insert(MediaContract.Albums.ALBUM_TABLE, null, albumValues);
 
         ContentValues artValues = new ContentValues();
-        artValues.put(MediaContract.SongArt.COLUMN_ART_HEIGHT, SongArt.getmHeight());
+        artValues.put(MediaContract.SongArt.COLUMN_ART_HEIGHT, SongArt.getHeight());
         artValues.put(MediaContract.SongArt.COLUMN_ART_WIDTH, SongArt.getWidth());
         artValues.put(MediaContract.SongArt.COLUMN_FOREIGN_KEY_SONGS, songID);
         long artID = database.insert(MediaContract.SongArt.COLUMN_FOREIGN_KEY_SONGS, null, artValues);

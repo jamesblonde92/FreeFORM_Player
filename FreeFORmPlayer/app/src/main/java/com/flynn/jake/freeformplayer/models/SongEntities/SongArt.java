@@ -12,7 +12,7 @@ public class SongArt {
         mWidth = width;
     }
 
-    public static int getmHeight() {
+    public static int getHeight() {
         return mHeight;
     }
 
