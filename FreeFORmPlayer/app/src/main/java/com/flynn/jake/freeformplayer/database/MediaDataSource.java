@@ -9,6 +9,7 @@ import com.flynn.jake.freeformplayer.models.Media;
 import com.flynn.jake.freeformplayer.models.SongEntities.*;
 import com.flynn.jake.freeformplayer.models.VideoEntities.*;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -20,6 +21,7 @@ public class MediaDataSource {
 
     private Context mContext;
     private MediaSQLightHelper mMediaSQLightHelper;
+    private SQLiteDatabase mDatabase;
 
     //-------End Variables------//
 
@@ -27,25 +29,26 @@ public class MediaDataSource {
 
     public MediaDataSource(Context context){
         mContext = context;
-        mMediaSQLightHelper = new MediaSQLightHelper(context);
+        mMediaSQLightHelper = new MediaSQLightHelper(mContext);
+
         //SQLiteDatabase database = mMediaSQLightHelper.getReadableDatabase();
         //database.close();
     }
 
-    private SQLiteDatabase open() {
-        return mMediaSQLightHelper.getWritableDatabase();
+    public void open()  {
+        mDatabase =  mMediaSQLightHelper.getWritableDatabase();
     }
 
-    private void close(SQLiteDatabase database){
-        database.close();
+    public void close(){
+        mDatabase.close();
     }
 
     //------End Constructors------//
 
-    //------CRUD Methods------//
+    //------ISUD Methods------//
 
-    public void create(Video video){
-        SQLiteDatabase database = open();
+    public void insertVideo(Video video){
+        SQLiteDatabase database = mDatabase;
         database.beginTransaction();        // used for thread safe code
 
         // Implementations details
@@ -59,16 +62,15 @@ public class MediaDataSource {
 
         database.setTransactionSuccessful();
         database.endTransaction();
-        close(database);
+        close();
     }
 
-    public void create(Song song){
-        SQLiteDatabase database = open();
+    public void insertSong(Song song){
+        SQLiteDatabase database = mDatabase;
         database.beginTransaction();        // used for thread safe code
 
         // Implementations details
         long mediaId = makeMediaId(song, database);
-
         ContentValues songValues = new ContentValues();
         songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_NAME, Song.getName());
         songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_LENGTH, Song.getLength());
@@ -92,15 +94,15 @@ public class MediaDataSource {
 
         database.setTransactionSuccessful();
         database.endTransaction();
-        close(database);
+        close();
     }
 
-    public ArrayList<Media> read(){
+    public ArrayList<Media> selectVideo(){
         return  null;
     }
 
-    public ArrayList<Song> readSongs(){
-        SQLiteDatabase database = open();
+    public ArrayList<Song> selectSong(){
+        SQLiteDatabase database = mDatabase;
 
         Cursor cursorMedia = database.query(
                 MediaContract.SongAttributes.SONG_TABLE,
@@ -140,6 +142,9 @@ public class MediaDataSource {
                 songs.add(song);
             }while (cursor.moveToNext());
         }
+
+        
+        cursorMedia.close();
         cursor.close();
         database.close();
         return songs;

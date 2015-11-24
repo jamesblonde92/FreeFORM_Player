@@ -6,12 +6,33 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.flynn.jake.freeformplayer.database.MediaDataSource;
+
+import java.sql.SQLException;
+
 public class MainActivity extends AppCompatActivity {
+
+    protected MediaDataSource mDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mDataSource = new MediaDataSource(MainActivity.this);
+
         setContentView(R.layout.activity_main);
+    }
+
+    protected void onResume(){
+        super.onResume();
+
+        mDataSource.open();
+    }
+
+    protected void onPause(){
+        super.onPause();
+
+        mDataSource.close();
     }
 
     @Override

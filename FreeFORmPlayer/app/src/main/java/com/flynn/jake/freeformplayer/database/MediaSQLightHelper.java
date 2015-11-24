@@ -12,7 +12,7 @@ public class MediaSQLightHelper extends SQLiteOpenHelper {
 
     //-------Variables-------//
 
-    private static final String DB_NAME = "Media.db";
+    private static final String DB_NAME = "media.db";
     private static final int DB_VERSION = 1;
 
     //-------End Variables-------//
