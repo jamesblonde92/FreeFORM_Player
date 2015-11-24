@@ -146,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         //-----------------End nav drawer----------------------
 
     }
