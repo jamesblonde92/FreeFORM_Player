@@ -43,10 +43,11 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //------------Initialize-------------
+
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         ListView listView = (ListView) findViewById(R.id.listView_songs);
-
 
         mDrawerItemArrayList = new ArrayList<DrawerItem>();
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.all_songs, " All Songs"));
@@ -55,12 +56,14 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.settings, " Settings"));
         mDrawerItemArrayList.trimToSize();
 
+        //-------------End initialize--------------
 
 
-        //---------------------
+
+        //---------------------External storage search---------------------
         ContentResolver contentResolver = getContentResolver();
         Uri uri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor cursor = contentResolver.query(uri, null, null, null, null );
+        Cursor cursor = contentResolver.query(uri, null, null, null, null);
 
         if (cursor == null) {
             // query failed, handle error.
@@ -71,33 +74,60 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             Toast.makeText(this, "no media", Toast.LENGTH_SHORT).show();
         }
         else {
-            Toast.makeText(this, "entered else", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "entered else for external search", Toast.LENGTH_SHORT).show();
             int titleColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
             int idColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
             do {
 
                 long thisId = cursor.getLong(idColumn);
                 String thisTitle = cursor.getString(titleColumn);
-                Toast.makeText(this, thisTitle + " : " + thisId, Toast.LENGTH_SHORT).show();
                 testList.add(thisTitle + " : " + thisId);
             } while (cursor.moveToNext());
         }
+        //------------------------End external storage search---------------------
 
 
-        //---------------------
+
+        //-------------------------Internal storage search---------------------
+        contentResolver = getContentResolver();
+        uri = android.provider.MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
+        cursor = contentResolver.query(uri, null, null, null, null);
+
+        if (cursor == null) {
+            // query failed, handle error.
+            Toast.makeText(this, "query failed", Toast.LENGTH_SHORT).show();
+        }
+        else if (!cursor.moveToFirst()) {
+            // no media on the device
+            Toast.makeText(this, "no media", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(this, "entered else for internal search", Toast.LENGTH_SHORT).show();
+            int titleColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
+            int idColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
+            do {
+                long thisId = cursor.getLong(idColumn);
+                String thisTitle = cursor.getString(titleColumn);
+                testList.add(thisTitle + " : " + thisId);
+            } while (cursor.moveToNext());
+        }
+        //-----------------------End internal storage search---------------------
+
+
+        //------------list view adapter------------------
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
                 this,
                 android.R.layout.simple_list_item_1,
                 testList );
-
         listView.setAdapter(arrayAdapter);
+        //-----------end list view adapter-----------------
 
 
+
+        //-------------------Nav drawer------------------------
         nav_item_adapter adapter = new nav_item_adapter(MainActivity.this, R.id.drawer_layout, mDrawerItemArrayList);
         mDrawerList.setAdapter(adapter);
         mDrawerList.setOnItemClickListener(this);
-
-
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.open_drawer, R.string.closed_drawer){
 
             public void onDrawerClosed(View view) {
@@ -114,22 +144,10 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             }
 
         };
-
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //testing media player and file scanner
-
-
-
-
-
-
-
-
-
-
-
+        //-----------------End nav drawer----------------------
 
     }
 
