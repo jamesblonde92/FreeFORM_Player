@@ -1,7 +1,9 @@
 package com.flynn.jake.freeformplayer;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,9 +19,11 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements ListView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements ListView.OnItemClickListener,
+        MediaPlayer.OnPreparedListener {
 
 
     //----------Variables----------//
@@ -123,6 +127,21 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         //-----------end list view adapter-----------------
 
 
+        MediaPlayer player = new MediaPlayer();
+        long currSong = 99685;
+        Uri trackUri = ContentUris.withAppendedId(
+                android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                currSong);
+        try {
+            Toast.makeText(MainActivity.this, "entered try", Toast.LENGTH_SHORT).show();
+            player.setDataSource(getApplicationContext(), trackUri);
+        } catch (IOException e) {
+            Toast.makeText(MainActivity.this, "entered catch", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+
+        player.prepareAsync();
+
 
         //-------------------Nav drawer------------------------
         nav_item_adapter adapter = new nav_item_adapter(MainActivity.this, R.id.drawer_layout, mDrawerItemArrayList);
@@ -155,6 +174,12 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        //start playback
+        mp.start();
     }
 
     @Override
