@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
 
         //---------------------External storage search---------------------
+        //DO NOT CHANGE PLEASE
         ContentResolver contentResolver = getContentResolver();
         Uri uri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor cursor = contentResolver.query(uri, null, null, null, null);
@@ -93,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
 
         //-------------------------Internal storage search---------------------
+        //DO NOT CHANGE PLEASE
         contentResolver = getContentResolver();
         uri = android.provider.MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
         cursor = contentResolver.query(uri, null, null, null, null);
@@ -127,7 +129,10 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         //-----------end list view adapter-----------------
 
 
+
+        //-----------Media Player stuff------------------
         MediaPlayer player = new MediaPlayer();
+        player.setOnPreparedListener(this);
         long currSong = 99685;
         Uri trackUri = ContentUris.withAppendedId(
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -149,7 +154,11 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         }
 
 
+        //------------------end media player stuff-----------------------------
+
+
         //-------------------Nav drawer------------------------
+        //DO NOT CHANGE PLEASE
         nav_item_adapter adapter = new nav_item_adapter(MainActivity.this, R.id.drawer_layout, mDrawerItemArrayList);
         mDrawerList.setAdapter(adapter);
         mDrawerList.setOnItemClickListener(this);
