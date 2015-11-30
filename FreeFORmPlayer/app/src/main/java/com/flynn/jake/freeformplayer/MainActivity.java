@@ -140,7 +140,13 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             e.printStackTrace();
         }
 
-        player.prepareAsync();
+        try {
+            Toast.makeText(MainActivity.this, "prepare try", Toast.LENGTH_SHORT).show();
+            player.prepare();
+        } catch (IOException e) {
+            Toast.makeText(MainActivity.this, "prepare catch", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
 
 
         //-------------------Nav drawer------------------------
