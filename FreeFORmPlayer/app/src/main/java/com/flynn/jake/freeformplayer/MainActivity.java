@@ -209,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         //Toast.makeText(this, mDrawerItemArrayList.get(position).getTitle(), Toast.LENGTH_LONG).show();
         Toast.makeText(this, "position is:" + position + " And content is: " + testList.get(position), Toast.LENGTH_LONG).show();
 
+        player.stop();
         player.reset();
         String[] tempHolder = testList.get(position).split(":");
         long idNumber = Integer.parseInt(tempHolder[tempHolder.length - 1].trim());
