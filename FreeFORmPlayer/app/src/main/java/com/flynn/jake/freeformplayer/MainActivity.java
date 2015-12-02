@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.media.MediaPlayer;
+import android.media.session.MediaController;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
@@ -15,12 +16,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.flynn.jake.freeformplayer.database.MediaDataSource;
 import com.flynn.jake.freeformplayer.models.Song;
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -38,11 +39,15 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     ActionBarDrawerToggle mDrawerToggle;
     private ArrayList<Song> songList = new ArrayList<>();
     MediaPlayer player;
+    MediaController mMediaController;
     private static final String OPEN_DRAWER = "Drawer closed";
     private static final String CLOSED_DRAWER = "Drawer open";
 
-    //----------EndVariables----------//
+    private Button mPlay;
+    private Button mPrev;
+    private Button mNext;
 
+    //----------EndVariables----------//
 
     protected MediaDataSource mDataSource;
 
@@ -60,7 +65,9 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         ListView listView = (ListView) findViewById(R.id.listView_songs);
         listView.setOnItemClickListener(this);
-
+        mPlay = (Button) findViewById(R.id.button_paly);
+        mNext = (Button) findViewById(R.id.button_next);
+        mPrev = (Button) findViewById(R.id.button_prev);
         mDrawerItemArrayList = new ArrayList<DrawerItem>();
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.all_songs, " All Songs"));
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.artist, " Artist"));
@@ -79,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         Uri intUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         updateList(intUri);
 
+
         //------------list view adapter------------------
 
         ArrayAdapter<Song> songArrayAdapter = new ArrayAdapter<Song>(
@@ -87,8 +95,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 songList);
         listView.setAdapter(songArrayAdapter);
 
-        //-----------end list view adapter-----------------
 
+        //-----------end list view adapter-----------------
 
         //-----------Media Player stuff------------------
         player = new MediaPlayer();
@@ -122,6 +130,37 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //-----------------End nav drawer----------------------
 
+
+        //-----------------ButtonListeners---------------------
+        mPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(player.isPlaying()){
+                    player.pause();
+                }
+                else{
+                    player.start();
+                }
+            }
+        });
+
+        mNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        mPrev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
+        //-----------------EndButtonListeners------------------
+
     }
 
     private void updateList(Uri inURI) {
@@ -133,13 +172,13 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
             if (cursor == null) {
                 // query failed, handle error.
-                Toast.makeText(this, "query failed", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "query failed", Toast.LENGTH_SHORT).show();
             } else if (!cursor.moveToFirst()) {
                 // no media on the device
-                Toast.makeText(this, "no media", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "no media", Toast.LENGTH_SHORT).show();
             } else {
 
-                Toast.makeText(this, "entered else for internal search", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "entered else for internal search", Toast.LENGTH_SHORT).show();
                 int titleColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
                 int idColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
 
@@ -160,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             }
             //-----------------------End storage search---------------------
         } catch (SecurityException e) {
-            Toast.makeText(MainActivity.this, "Security Exception", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, "Security Exception", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -185,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             player.release();
         }catch (Exception e)
         {
-            Toast.makeText(MainActivity.this, "Didnt stop", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, "Didnt stop", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -227,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(this, "position is:" + position + " And content is: " + songList.get(position), Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "position is:" + position + " And content is: " + songList.get(position), Toast.LENGTH_LONG).show();
 
         player.stop();
         player.reset();
@@ -241,18 +280,11 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
 
         if (trackUri == null) {
-            Toast.makeText(MainActivity.this, "trackUri is null", Toast.LENGTH_SHORT);
+            //Toast.makeText(MainActivity.this, "trackUri is null", Toast.LENGTH_SHORT);
         } else {
             try {
-                Toast.makeText(MainActivity.this, "entered try", Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(MainActivity.this, "entered try", Toast.LENGTH_SHORT).show();
                 player.setDataSource(getApplicationContext(), trackUri);
-            } catch (IOException e) {
-                Toast.makeText(MainActivity.this, "entered catch", Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
-            }
-
-            try {
-                Toast.makeText(MainActivity.this, "prepare try", Toast.LENGTH_SHORT).show();
                 player.prepare();
             } catch (Exception e) {
                 try {
@@ -262,13 +294,15 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                     player.setDataSource(getApplicationContext(), trackUri);
                     player.prepare();
                 } catch (Exception t) {
-                    Toast.makeText(MainActivity.this, "prepare catch", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this, "prepare catch", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
             }
-
         }
     }
 }
+
+
+
 
 
