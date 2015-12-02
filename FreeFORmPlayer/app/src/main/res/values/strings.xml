@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">FreeFORmPlayer</string>
-
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">About</string>
+    <string name="open_drawer">Drawer closed</string>
+    <string name="closed_drawer">drawer open</string>
+
 </resources>
