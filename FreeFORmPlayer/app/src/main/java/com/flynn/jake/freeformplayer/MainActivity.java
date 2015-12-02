@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.media.MediaPlayer;
+import android.media.session.MediaController;
 import android.net.Uri;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -35,12 +36,11 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     ActionBarDrawerToggle mDrawerToggle;
     private ArrayList<String> testList = new ArrayList<String>();
     MediaPlayer player;
-
+    MediaController mMediaController;
     private static final String OPEN_DRAWER = "Drawer closed";
     private static final String CLOSED_DRAWER = "Drawer open";
 
     //----------EndVariables----------//
-
 
 
     @Override
@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         ListView listView = (ListView) findViewById(R.id.listView_songs);
         listView.setOnItemClickListener(this);
 
+
+
         mDrawerItemArrayList = new ArrayList<DrawerItem>();
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.all_songs, " All Songs"));
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.artist, " Artist"));
@@ -63,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mDrawerItemArrayList.trimToSize();
 
         //-------------End initialize--------------
-
 
 
         //---------------------External storage search---------------------
@@ -75,12 +76,10 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         if (cursor == null) {
             // query failed, handle error.
             Toast.makeText(this, "query failed", Toast.LENGTH_SHORT).show();
-        }
-        else if (!cursor.moveToFirst()) {
+        } else if (!cursor.moveToFirst()) {
             // no media on the device
             Toast.makeText(this, "no media", Toast.LENGTH_SHORT).show();
-        }
-        else {
+        } else {
             Toast.makeText(this, "entered else for external search", Toast.LENGTH_SHORT).show();
             int titleColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
             int idColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
@@ -94,7 +93,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         //------------------------End external storage search---------------------
 
 
-
         //-------------------------Internal storage search---------------------
         //DO NOT CHANGE PLEASE
         contentResolver = getContentResolver();
@@ -104,12 +102,10 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         if (cursor == null) {
             // query failed, handle error.
             Toast.makeText(this, "query failed", Toast.LENGTH_SHORT).show();
-        }
-        else if (!cursor.moveToFirst()) {
+        } else if (!cursor.moveToFirst()) {
             // no media on the device
             Toast.makeText(this, "no media", Toast.LENGTH_SHORT).show();
-        }
-        else {
+        } else {
             Toast.makeText(this, "entered else for internal search", Toast.LENGTH_SHORT).show();
             int titleColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
             int idColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
@@ -126,16 +122,14 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
                 this,
                 android.R.layout.simple_list_item_1,
-                testList );
+                testList);
         listView.setAdapter(arrayAdapter);
         //-----------end list view adapter-----------------
-
 
 
         //-----------Media Player stuff------------------
         player = new MediaPlayer();
         player.setOnPreparedListener(this);
-
 
 
         //------------------end media player stuff-----------------------------
@@ -146,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         nav_item_adapter adapter = new nav_item_adapter(MainActivity.this, R.id.drawer_layout, mDrawerItemArrayList);
         mDrawerList.setAdapter(adapter);
         mDrawerList.setOnItemClickListener(this);
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.open_drawer, R.string.closed_drawer){
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.open_drawer, R.string.closed_drawer) {
 
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
@@ -235,5 +229,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
     }
 }
+
+
+
 
 
