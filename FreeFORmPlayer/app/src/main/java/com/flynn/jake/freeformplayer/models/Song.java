@@ -52,4 +52,8 @@ public class Song {
         mAlbum = album;
         return this;
     }
+
+    public String toString(){
+        return mName + " " + mSongID;
+    }
 }

@@ -22,6 +22,7 @@ import com.flynn.jake.freeformplayer.database.MediaDataSource;
 import com.flynn.jake.freeformplayer.models.Song;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements ListView.OnItemClickListener,
@@ -35,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private ImageView mImageView;
     ArrayList<DrawerItem> mDrawerItemArrayList;
     ActionBarDrawerToggle mDrawerToggle;
-    private ArrayList<String> testList = new ArrayList<String>();
     private ArrayList<Song> songList = new ArrayList<>();
     MediaPlayer player;
 
@@ -72,79 +72,12 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         //-------------End initialize--------------
 
 
-
         //---------------------External storage search---------------------
-        //DO NOT CHANGE PLEASE
-        ContentResolver contentResolver = getContentResolver();
+
         Uri uri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
-        Cursor cursor = contentResolver.query(uri, null, null, null, null);
-
-        if (cursor == null) {
-            // query failed, handle error.
-            Toast.makeText(this, "query failed", Toast.LENGTH_SHORT).show();
-        }
-        else if (!cursor.moveToFirst()) {
-            // no media on the device
-            Toast.makeText(this, "no media", Toast.LENGTH_SHORT).show();
-        }
-        else {
-            Toast.makeText(this, "entered else for external search", Toast.LENGTH_SHORT).show();
-            int titleColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
-            int idColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
-            do {
-
-                long thisId = cursor.getLong(idColumn);
-                String thisTitle = cursor.getString(titleColumn);
-               // testList.add(thisTitle + " : " + thisId);
-            } while (cursor.moveToNext());
-        }
-        //------------------------End external storage search---------------------
-
-
-
-        //-------------------------Internal storage search---------------------
-        //DO NOT CHANGE PLEASE
-        contentResolver = getContentResolver();
-        uri = android.provider.MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
-        cursor = contentResolver.query(uri, null, null, null, null);
-
-        if (cursor == null) {
-            // query failed, handle error.
-            Toast.makeText(this, "query failed", Toast.LENGTH_SHORT).show();
-        }
-        else if (!cursor.moveToFirst()) {
-            // no media on the device
-            Toast.makeText(this, "no media", Toast.LENGTH_SHORT).show();
-        }
-        else {
-            Toast.makeText(this, "entered else for internal search", Toast.LENGTH_SHORT).show();
-            int titleColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
-            int idColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
-
-            int artistColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int albumColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-
-            do {
-                long thisId = cursor.getLong(idColumn);
-                String thisTitle = cursor.getString(titleColumn);
-                String thisArtist = cursor.getString(artistColumn);
-                String thisAlbum = cursor.getString(albumColumn);
-
-                Song newSong = new Song(thisId, thisTitle, thisArtist, thisAlbum);
-
-             //   testList.add(thisTitle + " : " + thisId);
-                songList.add(newSong);
-            } while (cursor.moveToNext());
-        }
-        //-----------------------End internal storage search---------------------
-
+        updateList(uri);
 
         //------------list view adapter------------------
-//        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-//                this,
-//                android.R.layout.simple_list_item_1,
-//                testList );
-//        listView.setAdapter(arrayAdapter);
 
         ArrayAdapter<Song>  songArrayAdapter = new ArrayAdapter<Song>(
                 this,
@@ -152,17 +85,12 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 songList);
         listView.setAdapter(songArrayAdapter);
 
-
-
         //-----------end list view adapter-----------------
-
 
 
         //-----------Media Player stuff------------------
         player = new MediaPlayer();
         player.setOnPreparedListener(this);
-
-
 
         //------------------end media player stuff-----------------------------
 
@@ -192,6 +120,44 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //-----------------End nav drawer----------------------
 
+    }
+
+    private void updateList(Uri inURI) {
+        //-------------------------Internal storage search---------------------
+        //DO NOT CHANGE PLEASE
+        ContentResolver contentResolver = getContentResolver();
+        Uri uri = inURI;
+        Cursor cursor = contentResolver.query(uri, null, null, null, null);
+
+        if (cursor == null) {
+            // query failed, handle error.
+            Toast.makeText(this, "query failed", Toast.LENGTH_SHORT).show();
+        }
+        else if (!cursor.moveToFirst()) {
+            // no media on the device
+            Toast.makeText(this, "no media", Toast.LENGTH_SHORT).show();
+        }
+        else {
+
+            Toast.makeText(this, "entered else for internal search", Toast.LENGTH_SHORT).show();
+            int titleColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
+            int idColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
+
+            int artistColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int albumColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
+
+            do {
+                //Toast.makeText(this, MediaStore.Audio.Media.IS_MUSIC, Toast.LENGTH_SHORT).show();
+                long thisId = cursor.getLong(idColumn);
+                String thisTitle = cursor.getString(titleColumn);
+                String thisArtist = cursor.getString(artistColumn);
+                String thisAlbum = cursor.getString(albumColumn);
+
+                Song newSong = new Song(thisId, thisTitle, thisArtist, thisAlbum);
+                songList.add(newSong);
+            } while (cursor.moveToNext());
+        }
+        //-----------------------End internal storage search---------------------
     }
 
     protected void onResume(){
@@ -244,13 +210,10 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        //Toast.makeText(this, mDrawerItemArrayList.get(position).getTitle(), Toast.LENGTH_LONG).show();
         Toast.makeText(this, "position is:" + position + " And content is: " + songList.get(position), Toast.LENGTH_LONG).show();
 
         player.stop();
         player.reset();
-        //String[] tempHolder = testList.get(position).split(":");
-        //long idNumber = Integer.parseInt(tempHolder[tempHolder.length - 1].trim());
 
         long idNumber =  songList.get(position).getSongID();
 
