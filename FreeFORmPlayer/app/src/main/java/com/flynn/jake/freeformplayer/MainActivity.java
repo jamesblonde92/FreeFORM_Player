@@ -15,11 +15,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -40,6 +40,10 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private static final String OPEN_DRAWER = "Drawer closed";
     private static final String CLOSED_DRAWER = "Drawer open";
 
+    private Button mPlay;
+    private Button mPrev;
+    private Button mNext;
+
     //----------EndVariables----------//
 
 
@@ -54,9 +58,9 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         ListView listView = (ListView) findViewById(R.id.listView_songs);
         listView.setOnItemClickListener(this);
-
-
-
+        mPlay = (Button) findViewById(R.id.button_paly);
+        mNext = (Button) findViewById(R.id.button_next);
+        mPrev = (Button) findViewById(R.id.button_prev);
         mDrawerItemArrayList = new ArrayList<DrawerItem>();
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.all_songs, " All Songs"));
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.artist, " Artist"));
@@ -159,6 +163,37 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //-----------------End nav drawer----------------------
+
+
+        //-----------------ButtonListeners---------------------
+        mPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(player.isPlaying()){
+                    player.pause();
+                }
+                else{
+                    player.start();
+                }
+            }
+        });
+
+        mNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        mPrev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
+        //-----------------EndButtonListeners------------------
 
     }
 
