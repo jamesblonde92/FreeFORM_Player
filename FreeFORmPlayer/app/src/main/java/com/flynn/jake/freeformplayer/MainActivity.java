@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     ArrayList<DrawerItem> mDrawerItemArrayList;
     ActionBarDrawerToggle mDrawerToggle;
     private ArrayList<Song> songList = new ArrayList<>();
+    private
     MediaPlayer player;
 
     private static final String OPEN_DRAWER = "Drawer closed";
@@ -74,11 +75,11 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         //---------------------External storage search---------------------
 
-        Uri uri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
-        updateList(uri);
+        Uri extUri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
+        updateList(extUri);
 
-        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        updateList(uri);
+        Uri intUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        updateList(intUri);
 
         //------------list view adapter------------------
 
@@ -175,6 +176,19 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         super.onPause();
 
         //mDataSource.close();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        try{
+            player.stop();
+            player.reset();
+        }catch (Exception e)
+        {
+            Toast.makeText(MainActivity.this, "Didnt stop", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
