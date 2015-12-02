@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     ArrayList<DrawerItem> mDrawerItemArrayList;
     ActionBarDrawerToggle mDrawerToggle;
     private ArrayList<Song> songList = new ArrayList<>();
-    private
     MediaPlayer player;
 
     private static final String OPEN_DRAWER = "Drawer closed";
