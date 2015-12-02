@@ -5,13 +5,50 @@
     android:layout_height="match_parent">
     <!-- The main content view -->
 
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <ListView
 
-        <ListView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/listView_songs"
+        android:choiceMode="multipleChoiceModal"
+        android:layout_weight="4" />
 
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/listView_songs"
-            android:choiceMode="multipleChoiceModal" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1">
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Prev"
+            android:id="@+id/button_prev" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Play"
+            android:id="@+id/button_paly" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next"
+            android:id="@+id/button_next" />
+
+    </LinearLayout>
+
+</LinearLayout>
+
 
 
     <!-- The navigation drawer -->
