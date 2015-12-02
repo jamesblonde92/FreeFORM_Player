@@ -77,9 +77,12 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         Uri uri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
         updateList(uri);
 
+        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        updateList(uri);
+
         //------------list view adapter------------------
 
-        ArrayAdapter<Song>  songArrayAdapter = new ArrayAdapter<Song>(
+        ArrayAdapter<Song> songArrayAdapter = new ArrayAdapter<Song>(
                 this,
                 android.R.layout.simple_list_item_1,
                 songList);
@@ -100,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         nav_item_adapter adapter = new nav_item_adapter(MainActivity.this, R.id.drawer_layout, mDrawerItemArrayList);
         mDrawerList.setAdapter(adapter);
         mDrawerList.setOnItemClickListener(this);
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.open_drawer, R.string.closed_drawer){
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.open_drawer, R.string.closed_drawer) {
 
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
@@ -123,50 +126,52 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     }
 
     private void updateList(Uri inURI) {
-        //-------------------------Internal storage search---------------------
         //DO NOT CHANGE PLEASE
         ContentResolver contentResolver = getContentResolver();
         Uri uri = inURI;
-        Cursor cursor = contentResolver.query(uri, null, null, null, null);
+        try {
+            Cursor cursor = contentResolver.query(uri, null, null, null, null);
 
-        if (cursor == null) {
-            // query failed, handle error.
-            Toast.makeText(this, "query failed", Toast.LENGTH_SHORT).show();
+            if (cursor == null) {
+                // query failed, handle error.
+                Toast.makeText(this, "query failed", Toast.LENGTH_SHORT).show();
+            } else if (!cursor.moveToFirst()) {
+                // no media on the device
+                Toast.makeText(this, "no media", Toast.LENGTH_SHORT).show();
+            } else {
+
+                Toast.makeText(this, "entered else for internal search", Toast.LENGTH_SHORT).show();
+                int titleColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
+                int idColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
+
+                int artistColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+                int albumColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
+
+                do {
+                    //Toast.makeText(this, MediaStore.Audio.Media.IS_MUSIC, Toast.LENGTH_SHORT).show();
+                    long thisId = cursor.getLong(idColumn);
+                    String thisTitle = cursor.getString(titleColumn);
+                    String thisArtist = cursor.getString(artistColumn);
+                    String thisAlbum = cursor.getString(albumColumn);
+
+                    Song newSong = new Song(thisId, thisTitle, thisArtist, thisAlbum);
+                    songList.add(newSong);
+                } while (cursor.moveToNext());
+
+            }
+            //-----------------------End storage search---------------------
+        } catch (SecurityException e) {
+            Toast.makeText(MainActivity.this, "Security Exception", Toast.LENGTH_SHORT).show();
         }
-        else if (!cursor.moveToFirst()) {
-            // no media on the device
-            Toast.makeText(this, "no media", Toast.LENGTH_SHORT).show();
-        }
-        else {
-
-            Toast.makeText(this, "entered else for internal search", Toast.LENGTH_SHORT).show();
-            int titleColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
-            int idColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
-
-            int artistColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int albumColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-
-            do {
-                //Toast.makeText(this, MediaStore.Audio.Media.IS_MUSIC, Toast.LENGTH_SHORT).show();
-                long thisId = cursor.getLong(idColumn);
-                String thisTitle = cursor.getString(titleColumn);
-                String thisArtist = cursor.getString(artistColumn);
-                String thisAlbum = cursor.getString(albumColumn);
-
-                Song newSong = new Song(thisId, thisTitle, thisArtist, thisAlbum);
-                songList.add(newSong);
-            } while (cursor.moveToNext());
-        }
-        //-----------------------End internal storage search---------------------
     }
 
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
 
         //mDataSource.open();
     }
 
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
 
         //mDataSource.close();
@@ -215,27 +220,42 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         player.stop();
         player.reset();
 
-        long idNumber =  songList.get(position).getSongID();
+        long idNumber = songList.get(position).getSongID();
 
-        Uri trackUri = ContentUris.withAppendedId(
-                MediaStore.Audio.Media.INTERNAL_CONTENT_URI,
+        Uri trackUri = null;
+        trackUri = ContentUris.withAppendedId(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 idNumber);
-        try {
-            Toast.makeText(MainActivity.this, "entered try", Toast.LENGTH_SHORT).show();
-            player.setDataSource(getApplicationContext(), trackUri);
-        } catch (IOException e) {
-            Toast.makeText(MainActivity.this, "entered catch", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        }
 
-        try {
-            Toast.makeText(MainActivity.this, "prepare try", Toast.LENGTH_SHORT).show();
-            player.prepare();
-        } catch (IOException e) {
-            Toast.makeText(MainActivity.this, "prepare catch", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        }
 
+        if (trackUri == null) {
+            Toast.makeText(MainActivity.this, "trackUri is null", Toast.LENGTH_SHORT);
+        } else {
+            try {
+                Toast.makeText(MainActivity.this, "entered try", Toast.LENGTH_SHORT).show();
+                player.setDataSource(getApplicationContext(), trackUri);
+            } catch (IOException e) {
+                Toast.makeText(MainActivity.this, "entered catch", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+
+            try {
+                Toast.makeText(MainActivity.this, "prepare try", Toast.LENGTH_SHORT).show();
+                player.prepare();
+            } catch (Exception e) {
+                try {
+                    trackUri = ContentUris.withAppendedId(
+                            MediaStore.Audio.Media.INTERNAL_CONTENT_URI,
+                            idNumber);
+                    player.setDataSource(getApplicationContext(), trackUri);
+                    player.prepare();
+                } catch (Exception t) {
+                    Toast.makeText(MainActivity.this, "prepare catch", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+
+        }
     }
 }
 
