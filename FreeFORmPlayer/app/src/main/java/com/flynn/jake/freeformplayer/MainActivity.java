@@ -5,6 +5,7 @@ import android.content.ContentUris;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,17 +16,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
-<<<<<<< HEAD
 import com.flynn.jake.freeformplayer.database.MediaDataSource;
+import com.flynn.jake.freeformplayer.models.Song;
 
-import java.sql.SQLException;
-
-public class MainActivity extends AppCompatActivity {
-=======
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -41,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     ArrayList<DrawerItem> mDrawerItemArrayList;
     ActionBarDrawerToggle mDrawerToggle;
     private ArrayList<String> testList = new ArrayList<String>();
+    private ArrayList<Song> songList = new ArrayList<>();
     MediaPlayer player;
 
     private static final String OPEN_DRAWER = "Drawer closed";
@@ -48,8 +44,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
     //----------EndVariables----------//
 
-
->>>>>>> Olson
 
     protected MediaDataSource mDataSource;
 
@@ -82,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         //---------------------External storage search---------------------
         //DO NOT CHANGE PLEASE
         ContentResolver contentResolver = getContentResolver();
-        Uri uri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Uri uri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
         Cursor cursor = contentResolver.query(uri, null, null, null, null);
 
         if (cursor == null) {
@@ -101,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
                 long thisId = cursor.getLong(idColumn);
                 String thisTitle = cursor.getString(titleColumn);
-                testList.add(thisTitle + " : " + thisId);
+               // testList.add(thisTitle + " : " + thisId);
             } while (cursor.moveToNext());
         }
         //------------------------End external storage search---------------------
@@ -126,21 +120,40 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             Toast.makeText(this, "entered else for internal search", Toast.LENGTH_SHORT).show();
             int titleColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
             int idColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
+
+            int artistColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int albumColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
+
             do {
                 long thisId = cursor.getLong(idColumn);
                 String thisTitle = cursor.getString(titleColumn);
-                testList.add(thisTitle + " : " + thisId);
+                String thisArtist = cursor.getString(artistColumn);
+                String thisAlbum = cursor.getString(albumColumn);
+
+                Song newSong = new Song(thisId, thisTitle, thisArtist, thisAlbum);
+
+             //   testList.add(thisTitle + " : " + thisId);
+                songList.add(newSong);
             } while (cursor.moveToNext());
         }
         //-----------------------End internal storage search---------------------
 
 
         //------------list view adapter------------------
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+//        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+//                this,
+//                android.R.layout.simple_list_item_1,
+//                testList );
+//        listView.setAdapter(arrayAdapter);
+
+        ArrayAdapter<Song>  songArrayAdapter = new ArrayAdapter<Song>(
                 this,
                 android.R.layout.simple_list_item_1,
-                testList );
-        listView.setAdapter(arrayAdapter);
+                songList);
+        listView.setAdapter(songArrayAdapter);
+
+
+
         //-----------end list view adapter-----------------
 
 
@@ -184,13 +197,13 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     protected void onResume(){
         super.onResume();
 
-        mDataSource.open();
+        //mDataSource.open();
     }
 
     protected void onPause(){
         super.onPause();
 
-        mDataSource.close();
+        //mDataSource.close();
     }
 
     @Override
@@ -232,15 +245,17 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         //Toast.makeText(this, mDrawerItemArrayList.get(position).getTitle(), Toast.LENGTH_LONG).show();
-        Toast.makeText(this, "position is:" + position + " And content is: " + testList.get(position), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "position is:" + position + " And content is: " + songList.get(position), Toast.LENGTH_LONG).show();
 
         player.stop();
         player.reset();
-        String[] tempHolder = testList.get(position).split(":");
-        long idNumber = Integer.parseInt(tempHolder[tempHolder.length - 1].trim());
+        //String[] tempHolder = testList.get(position).split(":");
+        //long idNumber = Integer.parseInt(tempHolder[tempHolder.length - 1].trim());
+
+        long idNumber =  songList.get(position).getSongID();
 
         Uri trackUri = ContentUris.withAppendedId(
-                android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                MediaStore.Audio.Media.INTERNAL_CONTENT_URI,
                 idNumber);
         try {
             Toast.makeText(MainActivity.this, "entered try", Toast.LENGTH_SHORT).show();

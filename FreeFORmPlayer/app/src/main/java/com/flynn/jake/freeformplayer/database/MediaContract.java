@@ -22,7 +22,7 @@ public final class MediaContract {
     }
     //------End Media Table--------//
 
-    //------Song Tables--------//
+    //------SongEntity Tables--------//
     public static abstract class SongAttributes implements BaseColumns {
         public static final String SONG_TABLE = "Songs";
         public static final String COLUMN_FOREIGN_KEY_MEDIA = "MediaId";
@@ -47,7 +47,7 @@ public final class MediaContract {
         public static final String COLUMN_ART_WIDTH = "Width";
         // Might need more later.
     }
-    //------End Song Tables--------//
+    //------End SongEntity Tables--------//
 
     //------Video-------//
     public static abstract class Videos implements BaseColumns{

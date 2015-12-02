@@ -6,7 +6,7 @@ import com.flynn.jake.freeformplayer.models.Media;
 /**
  * Created by countrynerd on 11/8/15.
  */
-public class Song extends Media {
+public class SongEntity extends Media {
     private static String mName;
     private static String mGenreName;
     private static String mArtistName;
@@ -14,7 +14,7 @@ public class Song extends Media {
     //private static SongArt mArt;
     private static int mLength;
 
-    public Song(String type, String path, int size, String format, String name, String genre, String artist, int length){
+    public SongEntity(String type, String path, int size, String format, String name, String genre, String artist, int length){
         super(type, path, size, format);
         mName = name;
         mGenreName = genre;

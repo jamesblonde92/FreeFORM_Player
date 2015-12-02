@@ -9,7 +9,6 @@ import com.flynn.jake.freeformplayer.models.Media;
 import com.flynn.jake.freeformplayer.models.SongEntities.*;
 import com.flynn.jake.freeformplayer.models.VideoEntities.*;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -68,17 +67,17 @@ public class MediaDataSource {
         close();
     }
 
-    public void insertSong(Song song){
+    public void insertSong(SongEntity songEntity){
         SQLiteDatabase database = mDatabase;
         database.beginTransaction();        // used for thread safe code
 
         // Implementations details
-        long mediaId = makeMediaId(song, database);
+        long mediaId = makeMediaId(songEntity, database);
         ContentValues songValues = new ContentValues();
-        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_NAME, Song.getName());
-        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_LENGTH, Song.getLength());
-        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_ARTIST, Song.getArtistName());
-        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_GENRE, Song.getGenreName());
+        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_NAME, SongEntity.getName());
+        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_LENGTH, SongEntity.getLength());
+        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_ARTIST, SongEntity.getArtistName());
+        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_GENRE, SongEntity.getGenreName());
         songValues.put(MediaContract.SongAttributes.COLUMN_FOREIGN_KEY_MEDIA, mediaId);
         long songID = database.insert(MediaContract.SongAttributes.SONG_TABLE, null, songValues);
 
@@ -104,7 +103,7 @@ public class MediaDataSource {
         return  null;
     }
 
-    public ArrayList<Song> selectSong(){
+    public ArrayList<SongEntity> selectSong(){
         SQLiteDatabase database = mDatabase;
 
         Cursor cursorMedia = database.query(
@@ -132,17 +131,17 @@ public class MediaDataSource {
                 null, // Group By
                 null, // Having
                 null); // Order
-        ArrayList<Song> songs = new ArrayList<Song>();
+        ArrayList<SongEntity> songEntities = new ArrayList<SongEntity>();
         if (cursor.moveToFirst()){
             do{
-                Song song = new Song("Song", getStringFromColumName(cursor, MediaContract.MediaInfo.COLUMN_MEDIA_PATH),
+                SongEntity songEntity = new SongEntity("SongEntity", getStringFromColumName(cursor, MediaContract.MediaInfo.COLUMN_MEDIA_PATH),
                         getIntFromColumName(cursor, MediaContract.MediaInfo.COLUMN_MEDIA_SIZE),
                         getStringFromColumName(cursor, MediaContract.MediaInfo.COLUMN_MEDIA_FORMAT),
                         getStringFromColumName(cursor, MediaContract.SongAttributes.COLUMN_SONGS_NAME),
                         getStringFromColumName(cursor, MediaContract.SongAttributes.COLUMN_SONGS_GENRE),
                         getStringFromColumName(cursor, MediaContract.SongAttributes.COLUMN_SONGS_ARTIST),
                         getIntFromColumName(cursor, MediaContract.SongAttributes.COLUMN_SONGS_LENGTH));
-                songs.add(song);
+                songEntities.add(songEntity);
             }while (cursor.moveToNext());
         }
 
@@ -150,7 +149,7 @@ public class MediaDataSource {
         cursorMedia.close();
         cursor.close();
         database.close();
-        return songs;
+        return songEntities;
     }
 
     //------End CRUD Methods------//
