@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     ActionBarDrawerToggle mDrawerToggle;
     private ArrayList<Song> songList = new ArrayList<>();
     MediaPlayer player;
-
     private static final String OPEN_DRAWER = "Drawer closed";
     private static final String CLOSED_DRAWER = "Drawer open";
 
@@ -183,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         try{
             player.stop();
-            player.reset();
+            player.release();
         }catch (Exception e)
         {
             Toast.makeText(MainActivity.this, "Didnt stop", Toast.LENGTH_SHORT).show();
