@@ -1,11 +1,13 @@
 package com.flynn.jake.freeformplayer;
 
+import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.media.session.MediaController;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -19,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.flynn.jake.freeformplayer.database.MediaDataSource;
 import com.flynn.jake.freeformplayer.models.Song;
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ImageView mImageView;
+    private TextView mPlayingSong;
     ArrayList<DrawerItem> mDrawerItemArrayList;
     ActionBarDrawerToggle mDrawerToggle;
     private ArrayList<Song> songList = new ArrayList<>();
@@ -47,10 +51,14 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private Button mPrev;
     private Button mNext;
 
+    protected MediaDataSource mDataSource;
+    private int mPrevPosition;
+    private int mNextPosition;
+
     //----------EndVariables----------//
 
-    protected MediaDataSource mDataSource;
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         ListView listView = (ListView) findViewById(R.id.listView_songs);
+        mPlayingSong = (TextView) findViewById(R.id.playingSongText);
         listView.setOnItemClickListener(this);
         mPlay = (Button) findViewById(R.id.button_paly);
         mNext = (Button) findViewById(R.id.button_next);
@@ -94,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 android.R.layout.simple_list_item_1,
                 songList);
         listView.setAdapter(songArrayAdapter);
-
 
         //-----------end list view adapter-----------------
 
@@ -137,9 +145,11 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             public void onClick(View v) {
                 if(player.isPlaying()){
                     player.pause();
+                    mPlay.setText("Pause");
                 }
                 else{
                     player.start();
+                    mPlay.setText("Play");
                 }
             }
         });
@@ -147,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                //player.setNextMediaPlayer();
             }
         });
 
@@ -271,7 +281,24 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         player.stop();
         player.reset();
 
+        if (!(position+1 > songList.size()))
+            mNextPosition = position+1;
+        else
+            mNextPosition = 0;
+
+        if (!(position-1 < 0))
+            mPrevPosition = position-1;
+        else
+            mPrevPosition = songList.size()-1;
+
         long idNumber = songList.get(position).getSongID();
+        String songName = songList.get(position).getName();
+
+        if (!(songList.get(position).getArtist().equalsIgnoreCase("<unknown>")))
+            songName = songName + " : " + songList.get(position).getArtist();
+
+        mPlayingSong.setText(songName);
+
 
         Uri trackUri = null;
         trackUri = ContentUris.withAppendedId(

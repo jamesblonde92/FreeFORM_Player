@@ -54,6 +54,6 @@ public class Song {
     }
 
     public String toString(){
-        return mName + " " + mSongID;
+        return mName;
     }
 }
