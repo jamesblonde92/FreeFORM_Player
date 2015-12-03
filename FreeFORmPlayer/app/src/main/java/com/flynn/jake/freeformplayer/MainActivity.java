@@ -295,7 +295,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         String songName = songList.get(position).getName();
 
         if (!(songList.get(position).getArtist().equalsIgnoreCase("<unknown>")))
-            songName = songName + " : " + songList.get(position).getArtist();
+            songName = songName + "\n" + songList.get(position).getArtist();
 
         mPlayingSong.setText(songName);
 

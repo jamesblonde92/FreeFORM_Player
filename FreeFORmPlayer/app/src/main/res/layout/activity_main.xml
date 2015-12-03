@@ -78,8 +78,6 @@
             android:layout_alignParentEnd="true"
             android:gravity="center"
             android:textColor="#ffffff"
-            android:paddingLeft="10dp"
-            android:paddingRight="20dp"
             android:layout_below="@+id/button_prev"/>
 
     </RelativeLayout>
