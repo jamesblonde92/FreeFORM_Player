@@ -1,5 +1,7 @@
 package com.flynn.jake.freeformplayer.models;
 
+import android.net.Uri;
+
 /**
  * Created by countrynerd on 12/1/15.
  */
@@ -9,12 +11,14 @@ public class Song {
     private String mName;
     private String mArtist;
     private String mAlbum;
+    private Uri mUri;
 
-    public Song(long songID, String name, String artist, String album){
+    public Song(long songID, String name, String artist, String album, Uri uri){
         mSongID = songID;
         mName = name;
         mArtist = artist;
         mAlbum = album;
+        mUri = uri;
     }
 
     public long getSongID() {
@@ -55,5 +59,19 @@ public class Song {
 
     public String toString(){
         return mName;
+    }
+
+    public Song setSongID(long songID) {
+        mSongID = songID;
+        return this;
+    }
+
+    public Uri getUri() {
+        return mUri;
+    }
+
+    public Song setUri(Uri uri) {
+        mUri = uri;
+        return this;
     }
 }

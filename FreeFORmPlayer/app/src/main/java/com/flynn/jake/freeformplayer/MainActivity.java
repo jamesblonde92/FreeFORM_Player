@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.flynn.jake.freeformplayer.database.MediaDataSource;
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private TextView mPlayingSong;
     ArrayList<DrawerItem> mDrawerItemArrayList;
     ActionBarDrawerToggle mDrawerToggle;
+    private RelativeLayout mPlayControls;
     private ArrayList<Song> songList = new ArrayList<>();
     MediaPlayer player;
     MediaController mMediaController;
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mPlayControls = (RelativeLayout) findViewById(R.id.playControlsBox);
         ListView listView = (ListView) findViewById(R.id.listView_songs);
         mPlayingSong = (TextView) findViewById(R.id.playingSongText);
         listView.setOnItemClickListener(this);
@@ -107,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         //-----------end list view adapter-----------------
 
         //-----------Media Player stuff------------------
+
         player = new MediaPlayer();
         player.setOnPreparedListener(this);
 
@@ -140,6 +144,9 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
 
         //-----------------ButtonListeners---------------------
+
+        //mPlayControls.sj
+
         mPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -202,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                     String thisArtist = cursor.getString(artistColumn);
                     String thisAlbum = cursor.getString(albumColumn);
 
-                    Song newSong = new Song(thisId, thisTitle, thisArtist, thisAlbum);
+                    Song newSong = new Song(thisId, thisTitle, thisArtist, thisAlbum, inURI);
                     songList.add(newSong);
                 } while (cursor.moveToNext());
 
@@ -277,6 +284,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         //Toast.makeText(this, "position is:" + position + " And content is: " + songList.get(position), Toast.LENGTH_LONG).show();
+
 
         player.stop();
         player.reset();
