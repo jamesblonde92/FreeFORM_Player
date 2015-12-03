@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         setContentView(R.layout.activity_main);
 
         //------------Initialize-------------
-
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         ListView listView = (ListView) findViewById(R.id.listView_songs);
@@ -67,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.now_playing, " Now Playing"));
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.settings, " Settings"));
         mDrawerItemArrayList.trimToSize();
-
         //-------------End initialize--------------
 
 
