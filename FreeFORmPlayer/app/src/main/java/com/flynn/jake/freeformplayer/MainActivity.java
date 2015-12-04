@@ -214,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 } while (cursor.moveToNext());
 
             }
+            cursor.close();
             //-----------------------End storage search---------------------
         } catch (SecurityException e) {
             //Toast.makeText(MainActivity.this, "Security Exception", Toast.LENGTH_SHORT).show();
