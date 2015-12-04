@@ -40,7 +40,7 @@
             android:src="@drawable/ic_skip_previous_white_48dp"
             android:layout_alignLeft="@+id/playingSongText"
             android:layout_alignStart="@+id/playingSongText"
-            />
+            android:background="@drawable/roundedbutton" />
 
 
         <ImageButton
@@ -51,7 +51,7 @@
             android:layout_centerHorizontal="true"
             android:gravity="center"
             android:textAlignment="center"
-
+            android:background="@drawable/roundedbutton"
             android:src="@drawable/ic_pause_white_48dp"/>
 
         <ImageButton
@@ -63,7 +63,8 @@
 
             android:src="@drawable/ic_play_arrow_white_48dp"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/roundedbutton" />
 
         <ImageButton
             android:layout_width="56dp"
@@ -75,7 +76,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:adjustViewBounds="false"
-            />
+            android:background="@drawable/roundedbutton" />
 
         <TextView
             android:layout_width="wrap_content"
