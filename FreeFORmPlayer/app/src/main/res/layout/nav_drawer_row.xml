@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/nav_drawer_row">
+    android:id="@+id/nav_drawer_row"
+    android:paddingLeft="2dp"
+    android:contextClickable="false"
+    android:background="@android:color/black"
+    android:gravity="center_vertical|center_horizontal|fill"
+    android:textAlignment="center">
+
 
     <ImageView
         android:layout_width="wrap_content"
@@ -17,12 +24,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
         android:id="@+id/textView_Drawer_Name"
         android:layout_gravity="center_horizontal"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/imageView_icon"
         android:layout_toEndOf="@+id/imageView_icon"
-        android:textColor="#1efffa" />
+        android:textColor="#ffffff"
+        android:gravity="center_vertical|center"
+        android:textAlignment="center"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="200px">
+    </LinearLayout>
 
 </RelativeLayout>
