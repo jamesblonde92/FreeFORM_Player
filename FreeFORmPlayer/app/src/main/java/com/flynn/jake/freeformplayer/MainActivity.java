@@ -89,11 +89,13 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         //---------------------External storage search---------------------
 
-        Uri extUri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
-        updateList(extUri);
+
 
         Uri intUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         updateList(intUri);
+
+        Uri extUri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
+        updateList(extUri);
 
 
         //------------list view adapter------------------
