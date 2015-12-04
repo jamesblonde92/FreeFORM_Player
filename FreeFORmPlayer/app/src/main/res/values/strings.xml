@@ -3,5 +3,9 @@
     <string name="action_settings">About</string>
     <string name="open_drawer">Drawer closed</string>
     <string name="closed_drawer">drawer open</string>
+    <string name="play">Play</string>
+    <string name="next">Next</string>
+    <string name="prev">Prev</string>
+    <string name="pause">Pause</string>
 
 </resources>
