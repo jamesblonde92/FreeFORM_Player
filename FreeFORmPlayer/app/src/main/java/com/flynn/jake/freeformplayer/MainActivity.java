@@ -18,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -27,8 +26,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.flynn.jake.freeformplayer.database.MediaDataSource;
 import com.flynn.jake.freeformplayer.models.Song;
+
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements ListView.OnItemClickListener,
@@ -45,8 +44,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     ActionBarDrawerToggle mDrawerToggle;
     private RelativeLayout mPlayControls;
     private ArrayList<Song> songList = new ArrayList<>();
-    MediaPlayer player;
-    MediaController mMediaController;
+    MediaPlayer mPlayer;
     private static final String OPEN_DRAWER = "Drawer closed";
     private static final String CLOSED_DRAWER = "Drawer open";
 
@@ -110,17 +108,35 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         //-----------Media Player stuff------------------
 
-        player = new MediaPlayer();
-        player.setOnPreparedListener(this);
+        mPlayer = new MediaPlayer();
+        mPlayer.setOnPreparedListener(this);
 
-        //------------------end media player stuff-----------------------------
+        //------------------end mediaplayer stuff-----------------------------
 
 
         //-------------------Nav drawer------------------------
         //DO NOT CHANGE PLEASE
         nav_item_adapter adapter = new nav_item_adapter(MainActivity.this, R.id.drawer_layout, mDrawerItemArrayList);
         mDrawerList.setAdapter(adapter);
-        mDrawerList.setOnItemClickListener(this);
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        Toast.makeText(MainActivity.this, "nav drawer item 1", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 1:
+                        Toast.makeText(MainActivity.this, "nav drawer item 2", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 2:
+                        Toast.makeText(MainActivity.this, "nav drawer item 3", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 3:
+                        Toast.makeText(MainActivity.this, "nav drawer item 4", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        });
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.open_drawer, R.string.closed_drawer) {
 
             public void onDrawerClosed(View view) {
@@ -149,11 +165,11 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (player.isPlaying()) {
-                    player.pause();
+                if (mPlayer.isPlaying()) {
+                    mPlayer.pause();
                     mPlay.setAlpha(new Float(1.0));
                 } else {
-                    player.start();
+                    mPlayer.start();
                     mPlay.setAlpha(new Float(.0));
                 }
             }
@@ -162,14 +178,28 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //player.setNextMediaPlayer();
+                mPlayer.stop();
+                mPlayer.release();
+                mPlayer = new MediaPlayer();
+                setMediaPlayer(mPlayer, mNextPosition);
+                mNextPosition++;
+                mPrevPosition++;
+                mPlayer.start();
+
+
             }
         });
 
         mPrev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                mPlayer.stop();
+                mPlayer.release();
+                mPlayer = new MediaPlayer();
+                setMediaPlayer(mPlayer, mPrevPosition);
+                mNextPosition--;
+                mPrevPosition--;
+                mPlayer.start();
             }
         });
 
@@ -236,8 +266,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         super.onDestroy();
 
         try{
-            player.stop();
-            player.release();
+            mPlayer.stop();
+            mPlayer.release();
         }catch (Exception e)
         {
             //Toast.makeText(MainActivity.this, "Didnt stop", Toast.LENGTH_SHORT).show();
@@ -254,7 +284,9 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     @Override
     public void onPrepared(MediaPlayer mp) {
         //start playback
-        mp.start();
+        if(mp != null) {
+            mp.start();
+        }
     }
 
     @Override
@@ -285,8 +317,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         //Toast.makeText(this, "position is:" + position + " And content is: " + songList.get(position), Toast.LENGTH_LONG).show();
 
 
-        player.stop();
-        player.reset();
+        mPlayer.stop();
+        mPlayer.reset();
         //mPlay.setText(R.string.pause);
         mPlay.setAlpha((float) .0);
 
@@ -301,13 +333,29 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             mPrevPosition = songList.size()-1;
 
         long idNumber = songList.get(position).getSongID();
-        String songName = songList.get(position).getName();
 
+//        String songName = songList.get(position).getName();
+//        if (!(songList.get(position).getArtist().equalsIgnoreCase("<unknown>")))
+//            songName = songName + "\n" + songList.get(position).getArtist();
+//        mPlayingSong.setText(songName);
+
+        setSongName(position);
+        setMediaPlayer(mPlayer, position);
+
+        mPlayer.start();
+
+    }
+
+    public void setSongName(int position){
+        String songName = songList.get(position).getName();
         if (!(songList.get(position).getArtist().equalsIgnoreCase("<unknown>")))
             songName = songName + "\n" + songList.get(position).getArtist();
-
         mPlayingSong.setText(songName);
+    }
 
+
+    private void setMediaPlayer(MediaPlayer player, int position){
+        long idNumber = songList.get(position).getSongID();
 
         Uri trackUri = null;
         trackUri = ContentUris.withAppendedId(
@@ -319,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             //Toast.makeText(MainActivity.this, "trackUri is null", Toast.LENGTH_SHORT);
         } else {
             try {
-              //  Toast.makeText(MainActivity.this, "entered try", Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(MainActivity.this, "entered try", Toast.LENGTH_SHORT).show();
                 player.setDataSource(getApplicationContext(), trackUri);
                 player.prepare();
             } catch (Exception e) {
@@ -335,8 +383,14 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 }
             }
         }
+        setSongName(position);
     }
+
 }
+
+
+
+
 
 
 
