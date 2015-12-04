@@ -33,39 +33,50 @@
         android:padding="10dp"
         android:gravity="clip_horizontal|end">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="@string/prev"
+        <ImageButton
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:id="@+id/button_prev"
-            android:background="#ffffff"
-            android:textColor="#2196F3"
-            android:layout_alignTop="@+id/button_paly"
+            android:layout_alignTop="@+id/button_play"
+            android:src="@drawable/ic_skip_previous_white_48dp"
             android:layout_alignLeft="@+id/playingSongText"
-            android:layout_alignStart="@+id/playingSongText"/>
+            android:layout_alignStart="@+id/playingSongText"
+            android:layout_alignParentEnd="false"
+            android:background="@drawable/roundedbutton"/>
 
-        <Button
-            android:layout_width="100dp"
-            android:layout_height="48dp"
-            android:text="@string/play"
-            android:id="@+id/button_paly"
+        <ImageButton
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:id="@+id/button_pause"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:gravity="center"
             android:textAlignment="center"
-            android:background="#ffffff"
-            android:textColor="#2196F3"/>
+            android:background="@drawable/roundedbutton"
+            android:src="@drawable/ic_pause_white_48dp"/>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="@string/next"
+        <ImageButton
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:id="@+id/button_play"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:background="@drawable/roundedbutton"
+            android:src="@drawable/ic_play_arrow_white_48dp"/>
+
+        <ImageButton
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:id="@+id/button_next"
-            android:textColor="#2196F3"
-            android:background="#ffffff"
-            android:layout_alignTop="@+id/button_paly"
+            android:background="@drawable/roundedbutton"
+            android:src="@drawable/ic_skip_next_white_48dp"
+            android:layout_alignTop="@+id/button_play"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true"
+            android:adjustViewBounds="false"
+            />
 
         <TextView
             android:layout_width="wrap_content"

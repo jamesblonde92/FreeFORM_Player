@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -49,9 +50,9 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private static final String OPEN_DRAWER = "Drawer closed";
     private static final String CLOSED_DRAWER = "Drawer open";
 
-    private Button mPlay;
-    private Button mPrev;
-    private Button mNext;
+    private ImageButton mPlay;
+    private ImageButton mPrev;
+    private ImageButton mNext;
 
     protected MediaDataSource mDataSource;
     private int mPrevPosition;
@@ -77,9 +78,9 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         ListView listView = (ListView) findViewById(R.id.listView_songs);
         mPlayingSong = (TextView) findViewById(R.id.playingSongText);
         listView.setOnItemClickListener(this);
-        mPlay = (Button) findViewById(R.id.button_paly);
-        mNext = (Button) findViewById(R.id.button_next);
-        mPrev = (Button) findViewById(R.id.button_prev);
+        mPlay = (ImageButton) findViewById(R.id.button_play);
+        mNext = (ImageButton) findViewById(R.id.button_next);
+        mPrev = (ImageButton) findViewById(R.id.button_prev);
         mDrawerItemArrayList = new ArrayList<DrawerItem>();
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.all_songs, " All Songs"));
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.artist, " Artist"));
@@ -150,13 +151,12 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(player.isPlaying()){
+                if (player.isPlaying()) {
                     player.pause();
-                    mPlay.setText("Pause");
-                }
-                else{
+                    mPlay.setAlpha(new Float(1.0));
+                } else {
                     player.start();
-                    mPlay.setText("Play");
+                    mPlay.setAlpha(new Float(.0));
                 }
             }
         });
@@ -288,6 +288,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         player.stop();
         player.reset();
+        //mPlay.setText(R.string.pause);
+        mPlay.setAlpha((float) .0);
 
         if (!(position+1 > songList.size()))
             mNextPosition = position+1;
