@@ -16,8 +16,5 @@ allprojects {
     }
 }
 
-android {
-    compileSdkVersion 16
-}
 dependencies {
 }
