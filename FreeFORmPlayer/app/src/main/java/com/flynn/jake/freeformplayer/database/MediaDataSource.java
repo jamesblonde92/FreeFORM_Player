@@ -1,4 +1,5 @@
 package com.flynn.jake.freeformplayer.database;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,60 +8,44 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 
+import com.flynn.jake.freeformplayer.database.MediaContract;
+import com.flynn.jake.freeformplayer.database.MediaSQLightHelper;
 import com.flynn.jake.freeformplayer.models.Song;
 
 import java.util.ArrayList;
 
 /**
- * 
+ *
  * Created by countrynerd on 11/8/15.
  *
  */
 
-public class MediaDataSource extends SQLiteOpenHelper {
+public class MediaDataSource {
+
 
     //-------Variables------//
 
-    private static final String DB_NAME = "media.db";
-    private static final int DB_VERSION = 1;
     private Context mContext;
-    private SQLiteDatabase mDatabase;
-
-    public static final String SONG_TABLE = "Songs";
-    public static final String COLUMN_SONG_ID = "SongID";
-    public static final String COLUMN_SONGS_NAME = "SongName";
-    public static final String COLUMN_SONGS_GENRE = "GenreName";
-    public static final String COLUMN_SONGS_ARTIST = "ArtistName";
-    public static final String COLUMN_SONGS_YEAR = "SongYear";
-    public static final String COLUMN_SONGS_ALBUM = "AlbumName";;
-    public static final String COLUMN_SONG_URI = "SongURI";
+    private MediaSQLightHelper mMediaSQLightHelper;
 
     //-------End Variables------//
 
     //------Constructors------//
 
     public MediaDataSource(Context context){
-        super(context, DB_NAME, null, DB_VERSION);
+        mContext = context;
+        mMediaSQLightHelper = new MediaSQLightHelper(mContext);
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        String cmd = "CREATE TABLE " + SONG_TABLE + "(" +
-                COLUMN_SONG_ID + " INTEGER PRIMARY KEY," +
-                COLUMN_SONGS_NAME + " TEXT," +
-                COLUMN_SONGS_GENRE + " TEXT," +
-                COLUMN_SONGS_ARTIST + " TEXT," +
-                COLUMN_SONGS_ALBUM + " TEXT," +
-                COLUMN_SONGS_YEAR + " INTEGER," +
-                COLUMN_SONG_URI + " TEXT)";
-
-        db.execSQL(cmd);
+    public SQLiteDatabase open()  {
+        return mMediaSQLightHelper.getWritableDatabase();
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+    public void close(SQLiteDatabase database){
+        database.close();
     }
+
+    //------End Constructors------//
 
     //------End Constructors------//
 
@@ -68,18 +53,32 @@ public class MediaDataSource extends SQLiteOpenHelper {
 
 
     public ArrayList<Song> readSong(){
-        SQLiteDatabase database = this.getWritableDatabase();
+        SQLiteDatabase database = open();
 
-        String selectQuery = "SELECT  * FROM " + SONG_TABLE;
+        Cursor cursor = database.query(
+                MediaContract.SongAttributes.SONG_TABLE,
+                new String[]{MediaContract.SongAttributes.COLUMN_SONGS_NAME,
+                        MediaContract.SongAttributes.COLUMN_SONGS_ALBUM,
+                        MediaContract.SongAttributes.COLUMN_SONGS_ID,
+                        MediaContract.SongAttributes.COLUMN_SONGS_ARTIST,
+                        MediaContract.SongAttributes.COLUMN_SONGS_YEAR,
+                        MediaContract.SongAttributes.COLUMN_SONGS_GENRE},
+                null, // Selection
+                null, // Selection Args
+                null, // Group By
+                null, // Having
+                null); // Order
 
-        Cursor cursor = database.rawQuery(selectQuery,null);
         ArrayList<Song> songs = new ArrayList<Song>();
         if (cursor.moveToFirst())
         {
             do {
-                Song newSong = new Song(Long.parseLong(cursor.getString(0)), cursor.getString(1),
-                        cursor.getString(2), cursor.getString(3), cursor.getString(4),
-                        Integer.parseInt(cursor.getString(5)), null);
+                Song newSong = new Song(Long.parseLong(getStringFromColumnName(cursor, MediaContract.SongAttributes.COLUMN_SONGS_ID)),
+                        getStringFromColumnName(cursor, MediaContract.SongAttributes.COLUMN_SONGS_NAME),
+                        getStringFromColumnName(cursor, MediaContract.SongAttributes.COLUMN_SONGS_ARTIST),
+                        getStringFromColumnName(cursor, MediaContract.SongAttributes.COLUMN_SONGS_ALBUM),
+                        getStringFromColumnName(cursor, MediaContract.SongAttributes.COLUMN_SONGS_GENRE),
+                        getIntFromColumnName(cursor, MediaContract.SongAttributes.COLUMN_SONGS_YEAR), null);
                 songs.add(newSong);
             }while (cursor.moveToNext());
         }
@@ -89,17 +88,17 @@ public class MediaDataSource extends SQLiteOpenHelper {
     }
 
     public void addSong(Song newSong){
-        SQLiteDatabase database = this.getWritableDatabase();
+        SQLiteDatabase database = this.open();
 
         // Implementations details
         ContentValues songValues = new ContentValues();
-        songValues.put(COLUMN_SONGS_NAME, newSong.getName());
-        songValues.put(COLUMN_SONG_ID, newSong.getSongID());
-        songValues.put(COLUMN_SONGS_ARTIST, newSong.getArtist());
-        songValues.put(COLUMN_SONGS_GENRE, newSong.getGenre());
-        songValues.put(COLUMN_SONGS_ALBUM, newSong.getAlbum());
-        songValues.put(COLUMN_SONGS_YEAR, newSong.getYear());
-        database.insert(SONG_TABLE, null, songValues);
+        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_NAME, newSong.getName());
+        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_ID, "" + newSong.getSongID());
+        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_ARTIST, newSong.getArtist());
+        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_GENRE, newSong.getGenre());
+        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_ALBUM, newSong.getAlbum());
+        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_YEAR, newSong.getYear());
+
         database.close();
     }
 

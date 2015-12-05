@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.media.MediaDataSource;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -27,7 +28,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.flynn.jake.freeformplayer.database.MediaDataSource;
+import com.flynn.jake.freeformplayer.database.*;
 import com.flynn.jake.freeformplayer.models.Song;
 
 import java.util.ArrayList;
