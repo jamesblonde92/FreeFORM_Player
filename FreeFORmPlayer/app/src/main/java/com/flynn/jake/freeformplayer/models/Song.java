@@ -11,13 +11,15 @@ public class Song {
     private String mName;
     private String mArtist;
     private String mAlbum;
+    private String mGenre;
     private Uri mUri;
 
-    public Song(long songID, String name, String artist, String album, Uri uri){
+    public Song(long songID, String name, String artist, String album, String gerna, Uri uri){
         mSongID = songID;
         mName = name;
         mArtist = artist;
         mAlbum = album;
+        mGenre = gerna;
         mUri = uri;
     }
 
@@ -57,10 +59,6 @@ public class Song {
         return this;
     }
 
-    public String toString(){
-        return mName;
-    }
-
     public Song setSongID(long songID) {
         mSongID = songID;
         return this;
@@ -74,4 +72,18 @@ public class Song {
         mUri = uri;
         return this;
     }
+
+    public String getGenre() {
+        return mGenre;
+    }
+
+    public Song setGenre(String genre) {
+        mGenre = genre;
+        return this;
+    }
+
+    public String toString(){
+        return mName;
+    }
+
 }

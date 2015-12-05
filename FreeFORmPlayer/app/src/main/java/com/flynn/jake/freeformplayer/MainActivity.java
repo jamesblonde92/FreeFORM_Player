@@ -13,6 +13,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,10 +26,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.flynn.jake.freeformplayer.database.MediaDataSource;
+import com.flynn.jake.freeformplayer.models.Media;
 import com.flynn.jake.freeformplayer.models.Song;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements ListView.OnItemClickListener,
         MediaPlayer.OnPreparedListener {
@@ -55,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     protected MediaDataSource mDataSource;
     private int mPrevPosition;
     private int mNextPosition;
+
+    private HashMap mGenreMap = new HashMap<String, String>();
 
     //----------EndVariables----------//
 
@@ -89,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         //---------------------External storage search---------------------
 
-
+        genereSearch();
 
         Uri intUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         updateList(intUri);
@@ -223,14 +228,57 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         });
 
 
+        mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp) {
+                mPlay.setAlpha(new Float(1.0));
+            }
+        });
+
         //-----------------EndButtonListeners------------------
 
+    }
+
+    private void genereSearch()
+    {
+        int index;
+        long genreId;
+        Uri uri;
+        Cursor genrecursor;
+        Cursor tempcursor;
+        String[] proj1 = {MediaStore.Audio.Genres.NAME, MediaStore.Audio.Genres._ID};
+        String[] proj2 = {MediaStore.Audio.Media.TITLE};
+        String thisGenre = "";
+
+        genrecursor = managedQuery(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI, proj1, null, null, null);
+        if (genrecursor.moveToFirst()) {
+            do {
+                index = genrecursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME);
+                thisGenre = genrecursor.getString(index);
+                Log.i("Tag-Genre name", thisGenre);
+
+                index = genrecursor.getColumnIndexOrThrow(MediaStore.Audio.Genres._ID);
+                genreId = Long.parseLong(genrecursor.getString(index));
+                uri = MediaStore.Audio.Genres.Members.getContentUri("external", genreId);
+
+                tempcursor = managedQuery(uri, proj2, null,null,null);
+                //Log.i("Tag-Number of songs for this genre", tempcursor.getCount() + "");
+                if (tempcursor.moveToFirst()) {
+                    do {
+                        index = tempcursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
+                        mGenreMap.put(tempcursor.getString(index), thisGenre);
+                        Log.i("Tag-Song name", tempcursor.getString(index));
+                    } while(tempcursor.moveToNext());
+                }
+            } while(genrecursor.moveToNext());
+        }
     }
 
     private void updateList(Uri inURI) {
         //DO NOT CHANGE PLEASE
         ContentResolver contentResolver = getContentResolver();
         Uri uri = inURI;
+        String thisGenre = null;
+
         try {
             Cursor cursor = contentResolver.query(uri, null, null, null, null);
 
@@ -245,7 +293,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 //Toast.makeText(this, "entered else for internal search", Toast.LENGTH_SHORT).show();
                 int titleColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
                 int idColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
-
                 int artistColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
                 int albumColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
 
@@ -255,8 +302,11 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                     String thisTitle = cursor.getString(titleColumn);
                     String thisArtist = cursor.getString(artistColumn);
                     String thisAlbum = cursor.getString(albumColumn);
-
-                    Song newSong = new Song(thisId, thisTitle, thisArtist, thisAlbum, inURI);
+                    if (mGenreMap.containsKey(thisTitle))
+                        thisGenre = (String) mGenreMap.get(thisTitle);
+                    else
+                        thisGenre = null;
+                    Song newSong = new Song(thisId, thisTitle, thisArtist, thisAlbum, thisGenre, inURI);
                     songList.add(newSong);
                 } while (cursor.moveToNext());
 
