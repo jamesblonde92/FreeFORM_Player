@@ -1,8 +1,10 @@
 package com.flynn.jake.freeformplayer;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -31,12 +33,14 @@ import com.flynn.jake.freeformplayer.models.Song;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class MainActivity implements ListView.OnItemClickListener,
+public class MainActivity extends AppCompatActivity implements ListView.OnItemClickListener,
         MediaPlayer.OnPreparedListener {
 
 
     //----------Variables----------//
 
+    private Context mActivity;
+    private ListView mListView;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ImageView mImageView;
@@ -72,12 +76,13 @@ public class MainActivity implements ListView.OnItemClickListener,
         setContentView(R.layout.activity_main);
 
         //------------Initialize-------------
+        mActivity = this.getActivity();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mPlayControls = (RelativeLayout) findViewById(R.id.playControlsBox);
-        ListView listView = (ListView) findViewById(R.id.listView_songs);
+        mListView = (ListView) findViewById(R.id.listView_songs);
         mPlayingSong = (TextView) findViewById(R.id.playingSongText);
-        listView.setOnItemClickListener(this);
+        mListView.setOnItemClickListener(this);
         mPlay = (ImageButton) findViewById(R.id.button_play);
         mNext = (ImageButton) findViewById(R.id.button_next);
         mPrev = (ImageButton) findViewById(R.id.button_prev);
@@ -107,7 +112,7 @@ public class MainActivity implements ListView.OnItemClickListener,
                 this,
                 android.R.layout.simple_list_item_1,
                 songList);
-        listView.setAdapter(songArrayAdapter);
+        mListView.setAdapter(songArrayAdapter);
 
         //-----------end list view adapter-----------------
 
@@ -274,6 +279,7 @@ public class MainActivity implements ListView.OnItemClickListener,
     private void updateList(Uri inURI) {
         //DO NOT CHANGE PLEASE
         ContentResolver contentResolver = getContentResolver();
+        MediaDataSource mediaDataSource = new MediaDataSource(this);
         Uri uri = inURI;
         String thisGenre = null;
 
@@ -308,6 +314,7 @@ public class MainActivity implements ListView.OnItemClickListener,
                         thisGenre = null;
                     Song newSong = new Song(thisId, thisTitle, thisArtist, thisAlbum, thisGenre, thisYear, inURI);
                     songList.add(newSong);
+                    mediaDataSource.addSong(newSong);
                 } while (cursor.moveToNext());
 
             }
@@ -322,8 +329,14 @@ public class MainActivity implements ListView.OnItemClickListener,
         super.onResume();
 
         MediaDataSource dataSource = new MediaDataSource(this.getApplicationContext());
+        songList = dataSource.readSong();
 
-        //mDataSource.open();
+        ArrayAdapter<Song> songArrayAdapter = new ArrayAdapter<Song>(
+                this,
+                android.R.layout.simple_list_item_1,
+                songList);
+        mListView.setAdapter(songArrayAdapter);
+        //Toast.makeText(MainActivity.this, songList.get(0).getName(), Toast.LENGTH_LONG).show();
     }
 
     protected void onPause() {
@@ -452,6 +465,9 @@ public class MainActivity implements ListView.OnItemClickListener,
         setSongName(position);
     }
 
+    public Context getActivity() {
+        return mActivity;
+    }
 }
 
 
