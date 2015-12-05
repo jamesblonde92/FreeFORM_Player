@@ -3,13 +3,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
-import com.flynn.jake.freeformplayer.models.Album;
-import com.flynn.jake.freeformplayer.models.Media;
-import com.flynn.jake.freeformplayer.models.SongEntities.*;
-import com.flynn.jake.freeformplayer.models.VideoEntities.*;
-
-import java.util.ArrayList;
+import com.flynn.jake.freeformplayer.models.Song;
 
 /**
  * 
@@ -33,12 +27,12 @@ public class MediaDataSource {
         mContext = context;
         mMediaSQLightHelper = new MediaSQLightHelper(mContext);
 
-        //SQLiteDatabase database = mMediaSQLightHelper.getReadableDatabase();
-        //database.close();
+        SQLiteDatabase database = mMediaSQLightHelper.getReadableDatabase();
+        database.close();
     }
 
     public void open()  {
-        mDatabase =  mMediaSQLightHelper.getWritableDatabase();
+        //mDatabase =  mMediaSQLightHelper.getWritableDatabase();
     }
 
     public void close(){
@@ -49,59 +43,27 @@ public class MediaDataSource {
 
     //------ISUD Methods------//
 
-    public void insertVideo(Video video){
+
+    /*
+    public void insertSong(Song newSong){
         SQLiteDatabase database = mDatabase;
         database.beginTransaction();        // used for thread safe code
 
         // Implementations details
-        long mediaId = makeMediaId(video, database);
-
-        ContentValues videoValues = new ContentValues();
-        videoValues.put(MediaContract.Videos.COLUMN_VIDEO_NAME, Video.getName());
-        videoValues.put(MediaContract.Videos.COLUMN_VIDEO_LENGTH, Video.getLength());
-        videoValues.put(MediaContract.Videos.COLUMN_FOREIGN_KEY_MEDIA, mediaId);
-        long videoID = database.insert(MediaContract.Videos.VIDEO_TABLE, null, videoValues);
-
-        database.setTransactionSuccessful();
-        database.endTransaction();
-        close();
-    }
-
-    public void insertSong(SongEntity songEntity){
-        SQLiteDatabase database = mDatabase;
-        database.beginTransaction();        // used for thread safe code
-
-        // Implementations details
-        long mediaId = makeMediaId(songEntity, database);
+        long mediaId = makeMediaId(newSong, database);
         ContentValues songValues = new ContentValues();
-        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_NAME, SongEntity.getName());
-        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_LENGTH, SongEntity.getLength());
-        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_ARTIST, SongEntity.getArtistName());
+        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_NAME, Song());
+        songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_ARTIST, Song.getArtistName());
         songValues.put(MediaContract.SongAttributes.COLUMN_SONGS_GENRE, SongEntity.getGenreName());
         songValues.put(MediaContract.SongAttributes.COLUMN_FOREIGN_KEY_MEDIA, mediaId);
         long songID = database.insert(MediaContract.SongAttributes.SONG_TABLE, null, songValues);
 
-        ContentValues albumValues = new ContentValues();
-        albumValues.put(MediaContract.Albums.COLUMN_ALBUM_NAME, Album.getAlbumName());
-        albumValues.put(MediaContract.Albums.COLUMN_ALBUM_ARTIST, Album.getAlbumArtist());
-        albumValues.put(MediaContract.Albums.COLUMN_ALBUM_YEAR, Album.getAlbumYear());
-        albumValues.put(MediaContract.Albums.COLUMN_FOREIGN_KEY_SONGS, songID);
-        long albumID = database.insert(MediaContract.Albums.ALBUM_TABLE, null, albumValues);
-
-        ContentValues artValues = new ContentValues();
-        artValues.put(MediaContract.SongArt.COLUMN_ART_HEIGHT, SongArt.getHeight());
-        artValues.put(MediaContract.SongArt.COLUMN_ART_WIDTH, SongArt.getWidth());
-        artValues.put(MediaContract.SongArt.COLUMN_FOREIGN_KEY_SONGS, songID);
-        long artID = database.insert(MediaContract.SongArt.COLUMN_FOREIGN_KEY_SONGS, null, artValues);
 
         database.setTransactionSuccessful();
         database.endTransaction();
         close();
     }
 
-    public ArrayList<Media> selectVideo(){
-        return  null;
-    }
 
     public ArrayList<SongEntity> selectSong(){
         SQLiteDatabase database = mDatabase;
@@ -166,14 +128,15 @@ public class MediaDataSource {
         return cursor.getString(columnIndex);
     }
 
-    private long makeMediaId(Media media, SQLiteDatabase database){
+    private long makeSongId(Song song, SQLiteDatabase database){
         ContentValues mediaValues = new ContentValues();
-        mediaValues.put(MediaContract.MediaInfo.COLUMN_MEDIA_FORMAT, media.getFormat());
-        mediaValues.put(MediaContract.MediaInfo.COLUMN_MEDIA_PATH, media.getPath());
-        mediaValues.put(MediaContract.MediaInfo.COLUMN_MEDIA_SIZE, media.getSize());
-        mediaValues.put(MediaContract.MediaInfo.COLUMN_MEDIA_FORMAT, media.getFormat());
+        mediaValues.put(MediaContract.SongAttributes.C, song.getFormat());
+        mediaValues.put(MediaContract.SongAttributes.COLUMN_MEDIA_PATH, song.getPath());
+        mediaValues.put(MediaContract.SongAttributes.COLUMN_MEDIA_SIZE, song.getSize());
+        mediaValues.put(MediaContract.SongAttributes.COLUMN_MEDIA_FORMAT, song.getFormat());
 
         return database.insert(MediaContract.SongAttributes.SONG_TABLE, null, mediaValues);
     }
+    */
     //------End Helper Methods------//
 }

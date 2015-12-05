@@ -12,14 +12,16 @@ public class Song {
     private String mArtist;
     private String mAlbum;
     private String mGenre;
+    private int mYear;
     private Uri mUri;
 
-    public Song(long songID, String name, String artist, String album, String gerna, Uri uri){
+    public Song(long songID, String name, String artist, String album, String genre, int year, Uri uri){
         mSongID = songID;
         mName = name;
         mArtist = artist;
         mAlbum = album;
-        mGenre = gerna;
+        mGenre = genre;
+        mYear = year;
         mUri = uri;
     }
 
@@ -79,6 +81,15 @@ public class Song {
 
     public Song setGenre(String genre) {
         mGenre = genre;
+        return this;
+    }
+
+    public int getYear() {
+        return mYear;
+    }
+
+    public Song setYear(int year) {
+        mYear = year;
         return this;
     }
 
