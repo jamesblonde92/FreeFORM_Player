@@ -32,7 +32,7 @@ public class MediaDataSource extends SQLiteOpenHelper {
     public static final String COLUMN_SONGS_GENRE = "GenreName";
     public static final String COLUMN_SONGS_ARTIST = "ArtistName";
     public static final String COLUMN_SONGS_YEAR = "SongYear";
-    public static final String COLUMN_SONGS_ALBUM = "AlbumName";;
+    public static final String COLUMN_SONGS_ALBUM = "AlbumName";
     public static final String COLUMN_SONG_URI = "SongURI";
 
     //-------End Variables------//

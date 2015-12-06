@@ -28,7 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.flynn.jake.freeformplayer.database.MediaDataSource;
 import com.flynn.jake.freeformplayer.models.Song;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,7 +99,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
 
         //---------------------External storage search---------------------
-
         genereSearch();
 
         Uri intUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -245,6 +243,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             public void onCompletion(MediaPlayer mp) {
+
                 mPlay.setAlpha(new Float(.0));
                 mPlayer.stop();
                 mPlayer.reset();
