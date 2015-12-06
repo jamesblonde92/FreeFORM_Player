@@ -189,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                     mPlayer.start();
                     mPlay.setAlpha(new Float(.0));
                 }
+                mListView.smoothScrollToPosition(mNextPosition-1);
             }
         });
 
@@ -212,6 +213,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                     mPrevPosition = 0;
                 }
                     mPlayer.start();
+                mListView.smoothScrollToPosition(mNextPosition-1);
             }
         });
 
@@ -251,6 +253,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 mPlayer.start();
                 mNextPosition++;
                 mPrevPosition++;
+                mListView.smoothScrollToPosition(mNextPosition-1);
 
                 if(mNextPosition == songList.size()){
                     mNextPosition = 0;
