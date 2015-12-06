@@ -11,67 +11,82 @@ public class Song {
     private String mName;
     private String mArtist;
     private String mAlbum;
+    private String mGenre;
+    private int mYear;
     private Uri mUri;
 
-    public Song(long songID, String name, String artist, String album, Uri uri){
+    public Song(long songID, String name, String genre, String artist, String album,  int year, Uri uri){
         mSongID = songID;
         mName = name;
         mArtist = artist;
         mAlbum = album;
+        mGenre = genre;
+        mYear = year;
         mUri = uri;
     }
 
-    public long getSongID() {
-        return mSongID;
+    public int getSongID() {
+        return (int)mSongID;
     }
 
-    public Song setSongID(int songID) {
+    public void setSongID(int songID) {
         mSongID = songID;
-        return this;
     }
 
     public String getName() {
         return mName;
     }
 
-    public Song setName(String name) {
+    public void setName(String name) {
         mName = name;
-        return this;
     }
 
     public String getArtist() {
         return mArtist;
     }
 
-    public Song setArtist(String artist) {
+    public void setArtist(String artist) {
         mArtist = artist;
-        return this;
     }
 
     public String getAlbum() {
         return mAlbum;
     }
 
-    public Song setAlbum(String album) {
+    public void setAlbum(String album) {
         mAlbum = album;
-        return this;
     }
 
-    public String toString(){
-        return mName;
-    }
-
-    public Song setSongID(long songID) {
+    public void setSongID(long songID) {
         mSongID = songID;
-        return this;
     }
 
     public Uri getUri() {
         return mUri;
     }
 
-    public Song setUri(Uri uri) {
+    public void setUri(Uri uri) {
         mUri = uri;
-        return this;
     }
+
+    public String getGenre() {
+        return mGenre;
+    }
+
+    public void setGenre(String genre) {
+        mGenre = genre;
+    }
+
+    public int getYear() {
+        return mYear;
+    }
+
+    public void setYear(int year) {
+        mYear = year;
+    }
+
+    public String toString(){
+        return mName;
+    }
+
 }

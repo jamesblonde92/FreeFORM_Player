@@ -1,18 +1,20 @@
 package com.flynn.jake.freeformplayer;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
 import android.database.Cursor;
 import android.media.MediaPlayer;
-import android.media.session.MediaController;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,8 +29,9 @@ import android.widget.Toast;
 import com.flynn.jake.freeformplayer.database.MediaDataSource;
 import com.flynn.jake.freeformplayer.models.Song;
 
-import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements ListView.OnItemClickListener,
         MediaPlayer.OnPreparedListener {
@@ -36,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
     //----------Variables----------//
 
+    private Context mActivity;
+    private ListView mListView;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ImageView mImageView;
@@ -44,7 +49,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     ActionBarDrawerToggle mDrawerToggle;
     private RelativeLayout mPlayControls;
     private ArrayList<Song> songList = new ArrayList<>();
-    MediaPlayer mPlayer;
+    private ArrayList<Song> tempSongList = new ArrayList<>();
+    private MediaPlayer mPlayer;
     private static final String OPEN_DRAWER = "Drawer closed";
     private static final String CLOSED_DRAWER = "Drawer open";
 
@@ -56,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private int mPrevPosition;
     private int mNextPosition;
 
+    private HashMap mGenreMap = new HashMap<String, String>();
+
     //----------EndVariables----------//
 
 
@@ -64,17 +72,18 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mDataSource = new MediaDataSource(MainActivity.this);
+        //mDataSource = new MediaDataSource(MainActivity.this);
 
         setContentView(R.layout.activity_main);
 
         //------------Initialize-------------
+        mActivity = this.getActivity();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mPlayControls = (RelativeLayout) findViewById(R.id.playControlsBox);
-        ListView listView = (ListView) findViewById(R.id.listView_songs);
+        mListView = (ListView) findViewById(R.id.listView_songs);
         mPlayingSong = (TextView) findViewById(R.id.playingSongText);
-        listView.setOnItemClickListener(this);
+        mListView.setOnItemClickListener(this);
         mPlay = (ImageButton) findViewById(R.id.button_play);
         mNext = (ImageButton) findViewById(R.id.button_next);
         mPrev = (ImageButton) findViewById(R.id.button_prev);
@@ -89,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         //---------------------External storage search---------------------
 
-
+        genereSearch();
 
         Uri intUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         updateList(intUri);
@@ -104,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 this,
                 android.R.layout.simple_list_item_1,
                 songList);
-        listView.setAdapter(songArrayAdapter);
+        mListView.setAdapter(songArrayAdapter);
 
         //-----------end list view adapter-----------------
 
@@ -181,14 +190,22 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             @Override
             public void onClick(View v) {
                 mPlayer.stop();
-                mPlayer.release();
-                mPlayer = new MediaPlayer();
-                setMediaPlayer(mPlayer, mNextPosition);
-                mNextPosition++;
-                mPrevPosition++;
-                mPlayer.start();
+                mPlayer.reset();
+                //mPlayer = new MediaPlayer();
+                if (!((mNextPosition+1) >= (songList.size()))) {
+                    setMediaPlayer(mPlayer, mNextPosition);
+                    mNextPosition++;
+                    mPrevPosition++;
+                }
 
-
+                if (mNextPosition < 0){
+                    mNextPosition = 0;
+                    mPrevPosition = songList.size()-1;
+                    setMediaPlayer(mPlayer, mNextPosition);
+                    mNextPosition++;
+                    mPrevPosition = 0;
+                }
+                    mPlayer.start();
             }
         });
 
@@ -196,24 +213,91 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             @Override
             public void onClick(View v) {
                 mPlayer.stop();
-                mPlayer.release();
-                mPlayer = new MediaPlayer();
-                setMediaPlayer(mPlayer, mPrevPosition);
-                mNextPosition--;
-                mPrevPosition--;
+                mPlayer.reset();
+                //mPlayer = new MediaPlayer();
+                if (!(mPrevPosition < 0)) {
+                    setMediaPlayer(mPlayer, mPrevPosition);
+                    mNextPosition--;
+                    mPrevPosition--;
+                }
+
+                if (mPrevPosition > (songList.size()))
+                {
+                    mPrevPosition = songList.size()-1;
+                    mNextPosition = 1;
+                    setMediaPlayer(mPlayer, mPrevPosition);
+                }
                 mPlayer.start();
             }
         });
 
 
+        mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp) {
+                mPlay.setAlpha(new Float(.0));
+                mPlayer.stop();
+                mPlayer.reset();
+                //mPlayer = new MediaPlayer();
+                setMediaPlayer(mPlayer, mNextPosition);
+                mPlayer.start();
+                mNextPosition++;
+                mPrevPosition++;
+
+                if(mNextPosition == songList.size()){
+                    mNextPosition = 0;
+                }
+                if(mPrevPosition == songList.size()){
+                    mPrevPosition = 0;
+                }
+            }
+        });
+
         //-----------------EndButtonListeners------------------
 
+    }
+
+    private void genereSearch()
+    {
+        int index;
+        long genreId;
+        Uri uri;
+        Cursor genrecursor;
+        Cursor tempcursor;
+        String[] proj1 = {MediaStore.Audio.Genres.NAME, MediaStore.Audio.Genres._ID};
+        String[] proj2 = {MediaStore.Audio.Media.TITLE};
+        String thisGenre = "";
+
+        genrecursor = managedQuery(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI, proj1, null, null, null);
+        if (genrecursor.moveToFirst()) {
+            do {
+                index = genrecursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME);
+                thisGenre = genrecursor.getString(index);
+                Log.i("Genre name", thisGenre);
+
+                index = genrecursor.getColumnIndexOrThrow(MediaStore.Audio.Genres._ID);
+                genreId = Long.parseLong(genrecursor.getString(index));
+                uri = MediaStore.Audio.Genres.Members.getContentUri("external", genreId);
+
+                tempcursor = managedQuery(uri, proj2, null,null,null);
+                //Log.i("Tag-Number of songs for this genre", tempcursor.getCount() + "");
+                if (tempcursor.moveToFirst()) {
+                    do {
+                        index = tempcursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
+                        mGenreMap.put(tempcursor.getString(index), thisGenre);
+                        Log.i("Song name", tempcursor.getString(index));
+                    } while(tempcursor.moveToNext());
+                }
+            } while(genrecursor.moveToNext());
+        }
     }
 
     private void updateList(Uri inURI) {
         //DO NOT CHANGE PLEASE
         ContentResolver contentResolver = getContentResolver();
+        MediaDataSource mediaDataSource = new MediaDataSource(this);
         Uri uri = inURI;
+        String thisGenre = null;
+
         try {
             Cursor cursor = contentResolver.query(uri, null, null, null, null);
 
@@ -228,9 +312,9 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 //Toast.makeText(this, "entered else for internal search", Toast.LENGTH_SHORT).show();
                 int titleColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
                 int idColumn = cursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
-
                 int artistColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
                 int albumColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
+                int yearColumn = cursor.getColumnIndex(MediaStore.Audio.Media.YEAR);
 
                 do {
                     //Toast.makeText(this, MediaStore.Audio.Media.IS_MUSIC, Toast.LENGTH_SHORT).show();
@@ -238,9 +322,14 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                     String thisTitle = cursor.getString(titleColumn);
                     String thisArtist = cursor.getString(artistColumn);
                     String thisAlbum = cursor.getString(albumColumn);
-
-                    Song newSong = new Song(thisId, thisTitle, thisArtist, thisAlbum, inURI);
+                    int thisYear = cursor.getInt(yearColumn);
+                    if (mGenreMap.containsKey(thisTitle))
+                        thisGenre = (String) mGenreMap.get(thisTitle);
+                    else
+                        thisGenre = null;
+                    Song newSong = new Song(thisId, thisTitle, thisGenre, thisArtist, thisAlbum,  thisYear, inURI);
                     songList.add(newSong);
+                    mediaDataSource.addSong(newSong);
                 } while (cursor.moveToNext());
 
             }
@@ -254,7 +343,20 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     protected void onResume() {
         super.onResume();
 
-        //mDataSource.open();
+        MediaDataSource dataSource = new MediaDataSource(this.getApplicationContext());
+
+        tempSongList = dataSource.readSong();
+
+        songList = new ArrayList<Song>();
+        for (Song s : tempSongList) {
+            songList.add(s);
+        }
+
+        ArrayAdapter<Song> songArrayAdapter = new ArrayAdapter<Song>(
+                this,
+                android.R.layout.simple_list_item_1,
+                songList);
+        mListView.setAdapter(songArrayAdapter);
     }
 
     protected void onPause() {
@@ -316,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        //Toast.makeText(this, "position is:" + position + " And content is: " + songList.get(position), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "position is:" + position + " And content is: " + songList.get(position), Toast.LENGTH_LONG).show();
 
 
         mPlayer.stop();
@@ -324,22 +426,17 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         //mPlay.setText(R.string.pause);
         mPlay.setAlpha((float) .0);
 
-        if (!(position+1 > songList.size()))
+        if (!(position+1 > songList.size()-1))
             mNextPosition = position+1;
         else
             mNextPosition = 0;
 
-        if (!(position-1 < 0))
+        if (!(position < 0))
             mPrevPosition = position-1;
         else
             mPrevPosition = songList.size()-1;
 
         long idNumber = songList.get(position).getSongID();
-
-//        String songName = songList.get(position).getName();
-//        if (!(songList.get(position).getArtist().equalsIgnoreCase("<unknown>")))
-//            songName = songName + "\n" + songList.get(position).getArtist();
-//        mPlayingSong.setText(songName);
 
         setSongName(position);
         setMediaPlayer(mPlayer, position);
@@ -349,10 +446,13 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     }
 
     public void setSongName(int position){
-        String songName = songList.get(position).getName();
-        if (!(songList.get(position).getArtist().equalsIgnoreCase("<unknown>")))
-            songName = songName + "\n" + songList.get(position).getArtist();
-        mPlayingSong.setText(songName);
+        if(songList.get(position)!= null){
+            String songName = songList.get(position).getName();
+            if (!(songList.get(position).getArtist().equalsIgnoreCase("<unknown>"))) {
+                songName = songName + "\n" + songList.get(position).getArtist();
+            }
+            mPlayingSong.setText(songName);
+        }
     }
 
 
@@ -388,6 +488,9 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         setSongName(position);
     }
 
+    public Context getActivity() {
+        return mActivity;
+    }
 }
 
 
