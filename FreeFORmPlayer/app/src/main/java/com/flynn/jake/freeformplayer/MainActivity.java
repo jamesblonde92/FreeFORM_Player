@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //mDataSource = new MediaDataSource(MainActivity.this);
+        mDataSource = new MediaDataSource(MainActivity.this);
 
         setContentView(R.layout.activity_main);
 
