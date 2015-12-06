@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     protected MediaDataSource mDataSource;
     private int mPrevPosition;
     private int mNextPosition;
+    private boolean mArtistsDisplayed = false;
 
     private HashMap mGenreMap = new HashMap<String, String>();
 
@@ -84,9 +85,11 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mListView = (ListView) findViewById(R.id.listView_songs);
         mPlayingSong = (TextView) findViewById(R.id.playingSongText);
         mListView.setOnItemClickListener(this);
+
         mPlay = (ImageButton) findViewById(R.id.button_play);
         mNext = (ImageButton) findViewById(R.id.button_next);
         mPrev = (ImageButton) findViewById(R.id.button_prev);
+
         mDrawerItemArrayList = new ArrayList<DrawerItem>();
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.all_songs, " All Songs"));
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.artist, " Artist"));
@@ -135,9 +138,12 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 switch (position) {
                     case 0:
                         Toast.makeText(MainActivity.this, "nav drawer item 1", Toast.LENGTH_SHORT).show();
+
                         break;
                     case 1:
-                        Toast.makeText(MainActivity.this, "nav drawer item 2", Toast.LENGTH_SHORT).show();
+                        ////ToDo:
+                        //Add in logic to only display artist names in the list
+                        mArtistsDisplayed = true;
                         break;
                     case 2:
                         Toast.makeText(MainActivity.this, "nav drawer item 3", Toast.LENGTH_SHORT).show();
@@ -228,6 +234,9 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                     setMediaPlayer(mPlayer, mPrevPosition);
                 }
                 mPlayer.start();
+
+                mListView.smoothScrollToPosition(mNextPosition-1);
+
             }
         });
 
@@ -418,30 +427,35 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(this, "position is:" + position + " And content is: " + songList.get(position), Toast.LENGTH_LONG).show();
 
+        if(mArtistsDisplayed == true){
+            //// TODO:
+            //Add in logic to handle if a artist is clicked
+        }
 
-        mPlayer.stop();
-        mPlayer.reset();
-        //mPlay.setText(R.string.pause);
-        mPlay.setAlpha((float) .0);
+        else {
+            mPlayer.stop();
+            mPlayer.reset();
+            //mPlay.setText(R.string.pause);
+            mPlay.setAlpha((float) .0);
 
-        if (!(position+1 > songList.size()-1))
-            mNextPosition = position+1;
-        else
-            mNextPosition = 0;
+            if (!(position + 1 > songList.size() - 1))
+                mNextPosition = position + 1;
+            else
+                mNextPosition = 0;
 
-        if (!(position < 0))
-            mPrevPosition = position-1;
-        else
-            mPrevPosition = songList.size()-1;
+            if (!(position < 0))
+                mPrevPosition = position - 1;
+            else
+                mPrevPosition = songList.size() - 1;
 
-        long idNumber = songList.get(position).getSongID();
+            long idNumber = songList.get(position).getSongID();
 
-        setSongName(position);
-        setMediaPlayer(mPlayer, position);
+            setSongName(position);
+            setMediaPlayer(mPlayer, position);
 
-        mPlayer.start();
+            mPlayer.start();
+        }
 
     }
 

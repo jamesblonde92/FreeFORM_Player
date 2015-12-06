@@ -19,8 +19,7 @@
         android:layout_width="fill_parent"
         android:background="#FFF8E1"
         android:smoothScrollbar="true"
-        android:textAlignment="center"
-        />
+        android:textAlignment="center" />
 
     <RelativeLayout
         android:orientation="horizontal"
