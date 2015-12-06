@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.flynn.jake.freeformplayer.database.MediaDataSource;
 import com.flynn.jake.freeformplayer.models.Song;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -49,7 +50,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     ActionBarDrawerToggle mDrawerToggle;
     private RelativeLayout mPlayControls;
     private ArrayList<Song> songList = new ArrayList<>();
-    MediaPlayer mPlayer;
+    private ArrayList<Song> tempSongList = new ArrayList<>();
+    private MediaPlayer mPlayer;
     private static final String OPEN_DRAWER = "Drawer closed";
     private static final String CLOSED_DRAWER = "Drawer open";
 
@@ -189,9 +191,9 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             @Override
             public void onClick(View v) {
                 mPlayer.stop();
-                mPlayer.release();
-                mPlayer = new MediaPlayer();
-                if (!((mNextPosition+1) > (songList.size()))) {
+                mPlayer.reset();
+                //mPlayer = new MediaPlayer();
+                if (!((mNextPosition+1) >= (songList.size()))) {
                     setMediaPlayer(mPlayer, mNextPosition);
                     mNextPosition++;
                     mPrevPosition++;
@@ -212,8 +214,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             @Override
             public void onClick(View v) {
                 mPlayer.stop();
-                mPlayer.release();
-                mPlayer = new MediaPlayer();
+                mPlayer.reset();
+                //mPlayer = new MediaPlayer();
                 if (!(mPrevPosition < 0)) {
                     setMediaPlayer(mPlayer, mPrevPosition);
                     mNextPosition--;
@@ -222,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
                 if (mPrevPosition > (songList.size()))
                 {
-                    mPrevPosition = 0;
+                    mPrevPosition = songList.size()-1;
                     mNextPosition = 1;
                     setMediaPlayer(mPlayer, mPrevPosition);
                 }
@@ -233,7 +235,21 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             public void onCompletion(MediaPlayer mp) {
-                mPlay.setAlpha(new Float(1.0));
+                mPlay.setAlpha(new Float(.0));
+                mPlayer.stop();
+                mPlayer.reset();
+                //mPlayer = new MediaPlayer();
+                setMediaPlayer(mPlayer, mNextPosition);
+                mPlayer.start();
+                mNextPosition++;
+                mPrevPosition++;
+
+                if(mNextPosition == songList.size()){
+                    mNextPosition = 0;
+                }
+                if(mPrevPosition == songList.size()){
+                    mPrevPosition = 0;
+                }
             }
         });
 
@@ -312,7 +328,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                         thisGenre = (String) mGenreMap.get(thisTitle);
                     else
                         thisGenre = null;
-                    Song newSong = new Song(thisId, thisTitle, thisArtist, thisAlbum, thisGenre, thisYear, inURI);
+                    Song newSong = new Song(thisId, thisTitle, thisGenre, thisArtist, thisAlbum,  thisYear, inURI);
                     songList.add(newSong);
                     mediaDataSource.addSong(newSong);
                 } while (cursor.moveToNext());
@@ -329,14 +345,19 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         super.onResume();
 
         MediaDataSource dataSource = new MediaDataSource(this.getApplicationContext());
-        songList = dataSource.readSong();
+
+        tempSongList = dataSource.readSong();
+
+        songList = new ArrayList<Song>();
+        for (Song s : tempSongList) {
+            songList.add(s);
+        }
 
         ArrayAdapter<Song> songArrayAdapter = new ArrayAdapter<Song>(
                 this,
                 android.R.layout.simple_list_item_1,
                 songList);
         mListView.setAdapter(songArrayAdapter);
-        //Toast.makeText(MainActivity.this, songList.get(0).getName(), Toast.LENGTH_LONG).show();
     }
 
     protected void onPause() {
@@ -398,7 +419,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        //Toast.makeText(this, "position is:" + position + " And content is: " + songList.get(position), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "position is:" + position + " And content is: " + songList.get(position), Toast.LENGTH_LONG).show();
 
 
         mPlayer.stop();
@@ -406,12 +427,12 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         //mPlay.setText(R.string.pause);
         mPlay.setAlpha((float) .0);
 
-        if (!(position+1 > songList.size()))
+        if (!(position+1 > songList.size()-1))
             mNextPosition = position+1;
         else
             mNextPosition = 0;
 
-        if (!(position< 0))
+        if (!(position < 0))
             mPrevPosition = position-1;
         else
             mPrevPosition = songList.size()-1;
@@ -426,10 +447,13 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     }
 
     public void setSongName(int position){
-        String songName = songList.get(position).getName();
-        if (!(songList.get(position).getArtist().equalsIgnoreCase("<unknown>")))
-            songName = songName + "\n" + songList.get(position).getArtist();
-        mPlayingSong.setText(songName);
+        if(songList.get(position)!= null){
+            String songName = songList.get(position).getName();
+            if (!(songList.get(position).getArtist().equalsIgnoreCase("<unknown>"))) {
+                songName = songName + "\n" + songList.get(position).getArtist();
+            }
+            mPlayingSong.setText(songName);
+        }
     }
 
 

@@ -15,7 +15,7 @@ public class Song {
     private int mYear;
     private Uri mUri;
 
-    public Song(long songID, String name, String artist, String album, String genre, int year, Uri uri){
+    public Song(long songID, String name, String genre, String artist, String album,  int year, Uri uri){
         mSongID = songID;
         mName = name;
         mArtist = artist;
