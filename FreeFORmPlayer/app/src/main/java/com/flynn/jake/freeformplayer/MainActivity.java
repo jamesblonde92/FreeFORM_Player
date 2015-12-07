@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private final int SONGS_DISPLAYED = 0;
     private final int ARTISTS_DISPLAYED = 1;
     private final int GENRES_DISPLAYED = 2;
+    private final int SEEK_BAR_TOUCH = 3;
 
     private ImageButton mPlay;
     private ImageButton mPrev;
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private int mPrevPosition;
     private int mNextPosition;
     private int mCategoryDisplayed = SONGS_DISPLAYED;
+    private int mSeekBarCategoryDisplayedTemp = SONGS_DISPLAYED;
 
     private String mDrawerTitle;
     private String mTitle;
@@ -145,22 +147,18 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(mPlayer.isPlaying()){
-                    mPlayer.stop();
-                    mPlayer.seekTo(mPlayer.getDuration() * (progress / 100));
-                    mPlayer.start();
 
+                if(fromUser) {
+                    mPlayer.seekTo(mPlayer.getDuration() * progress / 100);
                 }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                mListView.setOnItemClickListener(null);
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
             }
         });
         //-------------EndSeekBar------------------
@@ -329,7 +327,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 mPlay.setAlpha(new Float(.0));
                 mPlayer.stop();
                 mPlayer.reset();
-                //mPlayer = new MediaPlayer();
                 setMediaPlayer(mPlayer, mNextPosition);
                 mPlayer.start();
                 mNextPosition++;
@@ -536,6 +533,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+
         if(mCategoryDisplayed == ARTISTS_DISPLAYED){
             //// TODO:
             //Add in logic to handle if a artist is clicked
@@ -555,6 +553,11 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             getSupportActionBar().setTitle(genreNameKeyword);
             mCategoryDisplayed = SONGS_DISPLAYED;
         }
+
+        else if(view.getId() == R.id.seekBar){
+
+        }
+
 
         else {
             mPlayer.stop();
@@ -623,6 +626,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             }
         }
         setSongName(position);
+        mSeekBar.setProgress(0);
     }
 
     public Context getActivity() {
