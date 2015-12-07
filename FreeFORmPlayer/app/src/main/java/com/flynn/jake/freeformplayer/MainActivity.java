@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
 
         //Anonymous inner class dealing with opening and closing the navDrawer
-        mDrawerTitle = "Open";
+        mDrawerTitle = "Select an option:";
         mTitle = "Closed";
         mTitle = mDrawerTitle =(String) getTitle();
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
@@ -408,12 +408,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private void populateSongListWithSongs(){
         MediaDataSource dataSource = new MediaDataSource(this.getApplicationContext());
 
-        tempSongList = dataSource.readSong();
-
-        songList = new ArrayList<Song>();
-        for (Song s : tempSongList) {
-            songList.add(s);
-        }
+        songList = dataSource.readSong();
 
         ArrayAdapter<Song> songArrayAdapter = new ArrayAdapter<Song>(
                 this,
@@ -427,15 +422,10 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         ArrayList<String> tempArtistList = dataSource.readCategory(categoryKeyword);
 
-        ArrayList<String> newList = new ArrayList<String>();
-        for (String s : tempArtistList) {
-            newList.add(s);
-        }
-
         ArrayAdapter<String> songArrayAdapter = new ArrayAdapter<String>(
                 this,
                 android.R.layout.simple_list_item_1,
-                newList);
+                tempArtistList);
         mListView.setAdapter(songArrayAdapter);
     }
 
@@ -443,12 +433,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         MediaDataSource dataSource = new MediaDataSource(this.getApplicationContext());
 
-        tempSongList = dataSource.readSongFromCategory(category, keyword);
-
-        songList = new ArrayList<Song>();
-        for (Song s : tempSongList) {
-            songList.add(s);
-        }
+        songList = dataSource.readSongFromCategory(category, keyword);
 
         ArrayAdapter<Song> songArrayAdapter = new ArrayAdapter<Song>(
                 this,
