@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="1.2"
+        android:layout_weight="1.5"
         android:id="@+id/playControlsBox"
         android:background="#607D8B"
         android:padding="0dp">
@@ -37,24 +37,23 @@
             android:layout_height="56dp"
             android:id="@+id/button_prev"
             android:src="@drawable/ic_skip_previous_white_48dp"
-            android:layout_alignParentTop="true"
+            android:background="@drawable/roundedbutton"
+            android:layout_below="@+id/seekBar"
             android:layout_toLeftOf="@+id/button_pause"
             android:layout_toStartOf="@+id/button_pause"
-            android:layout_marginRight="40dp"
-            android:layout_marginEnd="40dp"
-            android:background="@drawable/roundedbutton" />
+            android:layout_marginRight="40dp" />
 
         <ImageButton
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:id="@+id/button_pause"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
             android:gravity="center"
             android:textAlignment="center"
             android:background="@drawable/roundedbutton"
             android:src="@drawable/ic_pause_white_48dp"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:layout_below="@+id/seekBar"
+            android:layout_centerHorizontal="true" />
 
         <ImageButton
             android:layout_width="56dp"
@@ -64,9 +63,10 @@
             android:textAlignment="center"
 
             android:src="@drawable/ic_play_arrow_white_48dp"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/roundedbutton" />
+            android:background="@drawable/roundedbutton"
+            android:layout_below="@+id/seekBar"
+            android:layout_alignLeft="@+id/button_pause"
+            android:layout_alignStart="@+id/button_pause" />
 
         <ImageButton
             android:layout_width="56dp"
@@ -75,27 +75,26 @@
             android:src="@drawable/ic_skip_next_white_48dp"
             android:adjustViewBounds="false"
             android:clickable="true"
-            android:layout_above="@+id/playingSongText"
+            android:background="@drawable/roundedbutton"
+            android:layout_below="@+id/seekBar"
             android:layout_toRightOf="@+id/button_pause"
             android:layout_toEndOf="@+id/button_pause"
-            android:layout_marginLeft="40dp"
-            android:layout_marginStart="40dp"
-            android:background="@drawable/roundedbutton" />
+            android:layout_marginLeft="40dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:id="@+id/playingSongText"
+            android:gravity="center"
+            android:textColor="#ffffff"
+            android:textSize="20dp"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:gravity="center"
-            android:textColor="#ffffff"
-            android:layout_below="@+id/button_prev"
-            android:layout_alignParentBottom="true"
-            android:textSize="20dp" />
+            android:layout_below="@+id/button_prev" />
 
         <ImageButton
             android:layout_width="56dp"
@@ -118,6 +117,19 @@
             android:layout_alignParentStart="true"
             android:src="@drawable/ic_loop_black_48dp"
             android:background="@android:color/transparent"/>
+
+        <SeekBar
+            android:layout_width="300dp"
+            android:layout_height="30dp"
+            android:id="@+id/seekBar"
+            android:progress="60"
+            android:max="100"
+            android:indeterminate="false"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:splitTrack="false"
+            android:progressTint="#e82424"
+            android:progressTintMode="src_over" />
 
     </RelativeLayout>
 

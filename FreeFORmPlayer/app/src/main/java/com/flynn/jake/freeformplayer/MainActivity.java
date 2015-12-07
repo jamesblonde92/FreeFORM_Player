@@ -24,11 +24,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.flynn.jake.freeformplayer.database.MediaDataSource;
 import com.flynn.jake.freeformplayer.models.Song;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,15 +56,19 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private final int SONGS_DISPLAYED = 0;
     private final int ARTISTS_DISPLAYED = 1;
     private final int GENRES_DISPLAYED = 2;
+    private final int SEEK_BAR_TOUCH = 3;
 
     private ImageButton mPlay;
     private ImageButton mPrev;
     private ImageButton mNext;
 
+    private SeekBar mSeekBar;
+
     protected MediaDataSource mDataSource;
     private int mPrevPosition;
     private int mNextPosition;
     private int mCategoryDisplayed = SONGS_DISPLAYED;
+    private int mSeekBarCategoryDisplayedTemp = SONGS_DISPLAYED;
 
     private String mDrawerTitle;
     private String mTitle;
@@ -108,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
 
         //Anonymous inner class dealing with opening and closing the navDrawer
-        mDrawerTitle = "Open";
+        mDrawerTitle = "Select an option:";
         mTitle = "Closed";
         mTitle = mDrawerTitle =(String) getTitle();
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
@@ -137,8 +141,30 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         //-------------End initialize--------------
 
 
-        //---------------------External storage search---------------------
 
+        //-------------SeekBar--------------------
+        mSeekBar = (SeekBar) findViewById(R.id.seekBar);
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                if(fromUser) {
+                    mPlayer.seekTo(mPlayer.getDuration() * progress / 100);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+        //-------------EndSeekBar------------------
+
+
+        //---------------------External storage search---------------------
         genereSearch();
 
         Uri intUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -159,12 +185,12 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         //-----------end list view adapter-----------------
 
-        //-----------Media Player stuff------------------
+        //-----------Media Player Stuff------------------
 
         mPlayer = new MediaPlayer();
         mPlayer.setOnPreparedListener(this);
 
-        //------------------end mediaplayer stuff-----------------------------
+        //------------------End Media Player Stuff-----------------------------
 
 
         //-------------------Nav drawer------------------------
@@ -222,6 +248,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mDrawerToggle.syncState();
+
         //-----------------End nav drawer----------------------
 
 
@@ -295,10 +323,10 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             public void onCompletion(MediaPlayer mp) {
+
                 mPlay.setAlpha(new Float(.0));
                 mPlayer.stop();
                 mPlayer.reset();
-                //mPlayer = new MediaPlayer();
                 setMediaPlayer(mPlayer, mNextPosition);
                 mPlayer.start();
                 mNextPosition++;
@@ -409,7 +437,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private void populateSongListWithSongs(){
         MediaDataSource dataSource = new MediaDataSource(this.getApplicationContext());
 
-        songList = new ArrayList<Song>();
         songList = dataSource.readSong();
 
         ArrayAdapter<Song> songArrayAdapter = new ArrayAdapter<Song>(
@@ -422,12 +449,13 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private void populateSongListWithCategory(String categoryKeyword){
         MediaDataSource dataSource = new MediaDataSource(this.getApplicationContext());
 
-        ArrayList<String> newList = dataSource.readCategory(categoryKeyword);
+        ArrayList<String> tempArtistList = dataSource.readCategory(categoryKeyword);
+
 
         ArrayAdapter<String> songArrayAdapter = new ArrayAdapter<String>(
                 this,
                 android.R.layout.simple_list_item_1,
-                newList);
+                tempArtistList);
         mListView.setAdapter(songArrayAdapter);
     }
 
@@ -505,6 +533,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+
         if(mCategoryDisplayed == ARTISTS_DISPLAYED){
             //// TODO:
             //Add in logic to handle if a artist is clicked
@@ -524,6 +553,11 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             getSupportActionBar().setTitle(genreNameKeyword);
             mCategoryDisplayed = SONGS_DISPLAYED;
         }
+
+        else if(view.getId() == R.id.seekBar){
+
+        }
+
 
         else {
             mPlayer.stop();
@@ -592,6 +626,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             }
         }
         setSongName(position);
+        mSeekBar.setProgress(0);
     }
 
     public Context getActivity() {
