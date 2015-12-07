@@ -24,6 +24,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.flynn.jake.freeformplayer.database.MediaDataSource;
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private ImageButton mPlay;
     private ImageButton mPrev;
     private ImageButton mNext;
+
+    private SeekBar mSeekBar;
 
     protected MediaDataSource mDataSource;
     private int mPrevPosition;
@@ -98,6 +101,33 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         //-------------End initialize--------------
 
 
+
+        //-------------SeekBar--------------------
+        mSeekBar = (SeekBar) findViewById(R.id.seekBar);
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(mPlayer.isPlaying()){
+                    mPlayer.stop();
+                    mPlayer.seekTo(mPlayer.getDuration() * (progress / 100));
+                    mPlayer.start();
+
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                mListView.setOnItemClickListener(null);
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        //-------------EndSeekBar------------------
+
+
         //---------------------External storage search---------------------
         genereSearch();
 
@@ -118,12 +148,12 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         //-----------end list view adapter-----------------
 
-        //-----------Media Player stuff------------------
+        //-----------Media Player Stuff------------------
 
         mPlayer = new MediaPlayer();
         mPlayer.setOnPreparedListener(this);
 
-        //------------------end mediaplayer stuff-----------------------------
+        //------------------End Media Player Stuff-----------------------------
 
 
         //-------------------Nav drawer------------------------
