@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.flynn.jake.freeformplayer.models.Song;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -25,6 +26,7 @@ public class MediaDataSource extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "media.db";
     private static final int DB_VERSION = 1;
+    private static String DB_PATH = "";
     private Context mContext;
     private SQLiteDatabase mDatabase;
 
@@ -43,20 +45,38 @@ public class MediaDataSource extends SQLiteOpenHelper {
 
     public MediaDataSource(Context context){
         super(context, DB_NAME, null, DB_VERSION);
+
+        if(android.os.Build.VERSION.SDK_INT >= 17){
+            DB_PATH = context.getApplicationInfo().dataDir + "/databases/";
+        }
+        else
+        {
+            DB_PATH = "/data/data/" + context.getPackageName() + "/databases/";
+        }
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String cmd = "CREATE TABLE " + SONG_TABLE + "(" +
-                "SongSKU" + " TEXT," +
-                COLUMN_SONGS_NAME + " TEXT," +
-                COLUMN_SONGS_GENRE + " TEXT," +
-                COLUMN_SONGS_ARTIST + " TEXT," +
-                COLUMN_SONGS_ALBUM + " TEXT," +
-                COLUMN_SONGS_YEAR + " INTEGER," +
-                COLUMN_SONG_URI + " TEXT)";
+        boolean mDataBaseExist = checkDataBase();
+        if(!mDataBaseExist) {
+            String cmd = "CREATE TABLE " + SONG_TABLE + "(" +
+                    "SongSKU" + " TEXT," +
+                    COLUMN_SONGS_NAME + " TEXT," +
+                    COLUMN_SONGS_GENRE + " TEXT," +
+                    COLUMN_SONGS_ARTIST + " TEXT," +
+                    COLUMN_SONGS_ALBUM + " TEXT," +
+                    COLUMN_SONGS_YEAR + " INTEGER," +
+                    COLUMN_SONG_URI + " TEXT)";
 
-        db.execSQL(cmd);
+            db.execSQL(cmd);
+        }
+    }
+
+    private boolean checkDataBase()
+    {
+        File dbFile = new File(DB_PATH + DB_NAME);
+        Log.v("dbFile", dbFile + "   "+ dbFile.exists());
+        return dbFile.exists();
     }
 
     @Override
@@ -79,9 +99,13 @@ public class MediaDataSource extends SQLiteOpenHelper {
         if (cursor.moveToFirst())
         {
             do {
-                Song newSong = new Song(Long.parseLong(cursor.getString(0)), cursor.getString(1),
+                Song newSong = null;
+                if (cursor.getString(0) != null)
+                {
+                   newSong = new Song(Long.parseLong(cursor.getString(0)), cursor.getString(1),
                         cursor.getString(2), cursor.getString(3), cursor.getString(4),
                         Integer.parseInt(cursor.getString(5)), null);
+                }
                 if (newSong != null) {
                     songs.add(newSong);
                 }
@@ -146,7 +170,7 @@ public class MediaDataSource extends SQLiteOpenHelper {
         // Implementations details
         ContentValues songValues = new ContentValues();
         songValues.put(COLUMN_SONGS_NAME, newSong.getName());
-        //songValues.put("SongSKU", "" + newSong.getSongID());
+        songValues.put("SongSKU", "" + newSong.getSongID());
         songValues.put(COLUMN_SONGS_ARTIST, newSong.getArtist());
         songValues.put(COLUMN_SONGS_GENRE, newSong.getGenre());
         songValues.put(COLUMN_SONGS_ALBUM, newSong.getAlbum());

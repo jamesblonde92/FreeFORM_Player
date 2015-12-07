@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         Uri extUri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
         updateList(extUri);
 
+        populateSongListWithSongs();
 
         //------------list view adapter------------------
 
@@ -403,13 +404,12 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
     protected void onResume() {
         super.onResume();
-        populateSongListWithSongs();
-
     }
 
     private void populateSongListWithSongs(){
         MediaDataSource dataSource = new MediaDataSource(this.getApplicationContext());
 
+        songList = new ArrayList<Song>();
         songList = dataSource.readSong();
 
         ArrayAdapter<Song> songArrayAdapter = new ArrayAdapter<Song>(
@@ -446,8 +446,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
     protected void onPause() {
         super.onPause();
-
-        //mDataSource.close();
     }
 
     @Override
@@ -457,6 +455,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         try{
             mPlayer.stop();
             mPlayer.release();
+            mDataSource.close();
         }catch (Exception e)
         {
             //Toast.makeText(MainActivity.this, "Didnt stop", Toast.LENGTH_SHORT).show();
