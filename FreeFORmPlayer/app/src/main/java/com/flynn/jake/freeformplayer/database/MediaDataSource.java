@@ -45,20 +45,11 @@ public class MediaDataSource extends SQLiteOpenHelper {
 
     public MediaDataSource(Context context){
         super(context, DB_NAME, null, DB_VERSION);
-
-        if(android.os.Build.VERSION.SDK_INT >= 17){
-            DB_PATH = context.getApplicationInfo().dataDir + "/databases/";
-        }
-        else
-        {
-            DB_PATH = "/data/data/" + context.getPackageName() + "/databases/";
-        }
+        
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        boolean mDataBaseExist = checkDataBase();
-        if(!mDataBaseExist) {
             String cmd = "CREATE TABLE " + SONG_TABLE + "(" +
                     "SongSKU" + " TEXT," +
                     COLUMN_SONGS_NAME + " TEXT," +
@@ -69,14 +60,6 @@ public class MediaDataSource extends SQLiteOpenHelper {
                     COLUMN_SONG_URI + " TEXT)";
 
             db.execSQL(cmd);
-        }
-    }
-
-    private boolean checkDataBase()
-    {
-        File dbFile = new File(DB_PATH + DB_NAME);
-        Log.v("dbFile", dbFile + "   "+ dbFile.exists());
-        return dbFile.exists();
     }
 
     @Override
