@@ -49,10 +49,9 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     ActionBarDrawerToggle mDrawerToggle;
     private RelativeLayout mPlayControls;
     private ArrayList<Song> songList = new ArrayList<>();
-    private ArrayList<Song> tempSongList = new ArrayList<>();
     private MediaPlayer mPlayer;
-    private static final String OPEN_DRAWER = "Drawer closed";
-    private static final String CLOSED_DRAWER = "Drawer open";
+    private String OPEN_DRAWER = "All Songs";
+    private String CLOSED_DRAWER = "Menu";
 
     private final int SONGS_DISPLAYED = 0;
     private final int ARTISTS_DISPLAYED = 1;
@@ -73,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
 
     private HashMap mGenreMap = new HashMap<String, String>();
+    private String mSubCatagory = "All Songs";
 
     //----------EndVariables----------//
 
@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         Uri extUri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
         updateList(extUri);
 
+        populateSongListWithSongs();
 
         //------------list view adapter------------------
 
@@ -177,22 +178,24 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                     case 0:
                         populateSongListWithSongs();
                         mCategoryDisplayed = SONGS_DISPLAYED;
+                        OPEN_DRAWER = "All Songs";
+                        mSubCatagory = "All Songs";
                         mDrawerLayout.closeDrawers();
-
                         break;
                     case 1:
                         ////ToDo:
                         //Add in logic to only display artist names in the list
                         populateSongListWithCategory("ArtistName");
+                        OPEN_DRAWER = "Artists";
                         mCategoryDisplayed = ARTISTS_DISPLAYED;
                         mDrawerLayout.closeDrawers();
 
                         break;
                     case 2:
                         populateSongListWithCategory("GenreName");
+                        OPEN_DRAWER = "Genres";
                         mCategoryDisplayed = GENRES_DISPLAYED;
                         mDrawerLayout.closeDrawers();
-
                         break;
                     case 3:
                         Toast.makeText(MainActivity.this, "nav drawer item 4", Toast.LENGTH_SHORT).show();
@@ -219,6 +222,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mDrawerToggle.syncState();
+
         //-----------------End nav drawer----------------------
 
 
@@ -270,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 mPlayer.stop();
                 mPlayer.reset();
                 //mPlayer = new MediaPlayer();
-                if (!(mPrevPosition < 0)) {
+                if (!(mPrevPosition < 0) && !(mPrevPosition > songList.size())) {
                     setMediaPlayer(mPlayer, mPrevPosition);
                     mNextPosition--;
                     mPrevPosition--;
@@ -282,8 +287,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                     mNextPosition = 1;
                     setMediaPlayer(mPlayer, mPrevPosition);
                 }
-                mPlayer.start();
 
+                mPlayer.start();
                 mListView.smoothScrollToPosition(mNextPosition-1);
 
             }
@@ -401,8 +406,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
     protected void onResume() {
         super.onResume();
-        populateSongListWithSongs();
-
     }
 
     private void populateSongListWithSongs(){
@@ -421,6 +424,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         MediaDataSource dataSource = new MediaDataSource(this.getApplicationContext());
 
         ArrayList<String> tempArtistList = dataSource.readCategory(categoryKeyword);
+
 
         ArrayAdapter<String> songArrayAdapter = new ArrayAdapter<String>(
                 this,
@@ -444,8 +448,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
     protected void onPause() {
         super.onPause();
-
-        //mDataSource.close();
     }
 
     @Override
@@ -455,6 +457,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         try{
             mPlayer.stop();
             mPlayer.release();
+            mDataSource.close();
         }catch (Exception e)
         {
             //Toast.makeText(MainActivity.this, "Didnt stop", Toast.LENGTH_SHORT).show();
@@ -510,14 +513,17 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             String artistNameKeyword=(String)parent.getItemAtPosition(position);
 
             populateSongListWithSongsFromCategory("ArtistName", "'"+ artistNameKeyword +"'");
-
+            getSupportActionBar().setTitle(artistNameKeyword);
             mCategoryDisplayed = SONGS_DISPLAYED;
         }
 
         else if(mCategoryDisplayed == GENRES_DISPLAYED){
             //// TODO:
             //Add in logic to handle if a artist is clicked
+            String genreNameKeyword = (String) parent.getItemAtPosition(position);
 
+            populateSongListWithSongsFromCategory("GenreName", "'" + genreNameKeyword + "'");
+            getSupportActionBar().setTitle(genreNameKeyword);
             mCategoryDisplayed = SONGS_DISPLAYED;
         }
 
