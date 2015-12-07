@@ -25,12 +25,8 @@ public class Song {
         mUri = uri;
     }
 
-    public int getSongID() {
-        return (int)mSongID;
-    }
-
-    public void setSongID(int songID) {
-        mSongID = songID;
+    public long getSongID() {
+        return mSongID;
     }
 
     public String getName() {

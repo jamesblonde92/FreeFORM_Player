@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.flynn.jake.freeformplayer.models.Song;
 
@@ -46,7 +48,7 @@ public class MediaDataSource extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String cmd = "CREATE TABLE " + SONG_TABLE + "(" +
-                COLUMN_SONG_ID + " INTEGER PRIMARY KEY," +
+                "SongSKU" + " TEXT," +
                 COLUMN_SONGS_NAME + " TEXT," +
                 COLUMN_SONGS_GENRE + " TEXT," +
                 COLUMN_SONGS_ARTIST + " TEXT," +
@@ -80,7 +82,9 @@ public class MediaDataSource extends SQLiteOpenHelper {
                 Song newSong = new Song(Long.parseLong(cursor.getString(0)), cursor.getString(1),
                         cursor.getString(2), cursor.getString(3), cursor.getString(4),
                         Integer.parseInt(cursor.getString(5)), null);
-                songs.add(newSong);
+                if (newSong != null) {
+                    songs.add(newSong);
+                }
             }while (cursor.moveToNext());
         }
         cursor.close();
@@ -101,7 +105,11 @@ public class MediaDataSource extends SQLiteOpenHelper {
                 Song newSong = new Song(Long.parseLong(cursor.getString(0)), cursor.getString(1),
                         cursor.getString(2), cursor.getString(3), cursor.getString(4),
                         Integer.parseInt(cursor.getString(5)), null);
-                songs.add(newSong);
+
+                if (newSong != null)
+                {
+                    songs.add(newSong);
+                }
             }while (cursor.moveToNext());
         }
         cursor.close();
@@ -114,13 +122,17 @@ public class MediaDataSource extends SQLiteOpenHelper {
 
         String selectQuery = "SELECT " + queryKeyword +" FROM " + SONG_TABLE + " GROUP BY " + queryKeyword + " ORDER BY " + queryKeyword;
 
+
         Cursor cursor = database.rawQuery(selectQuery,null);
         ArrayList<String> artists = new ArrayList<String>();
         if (cursor.moveToFirst())
         {
             do {
                 String newArtist = cursor.getString(0);
-                artists.add(newArtist);
+                if (newArtist != null) {
+                    Log.i("Label found: " , newArtist);
+                    artists.add(newArtist);
+                }
             }while (cursor.moveToNext());
         }
         cursor.close();
@@ -128,22 +140,21 @@ public class MediaDataSource extends SQLiteOpenHelper {
         return artists;
     }
 
-    public void addSong(Song newSong){
+    public void addSong(Song newSong) {
         SQLiteDatabase database = this.getWritableDatabase();
 
         // Implementations details
         ContentValues songValues = new ContentValues();
         songValues.put(COLUMN_SONGS_NAME, newSong.getName());
-        songValues.put(COLUMN_SONG_ID, newSong.getSongID());
+        //songValues.put("SongSKU", "" + newSong.getSongID());
         songValues.put(COLUMN_SONGS_ARTIST, newSong.getArtist());
         songValues.put(COLUMN_SONGS_GENRE, newSong.getGenre());
         songValues.put(COLUMN_SONGS_ALBUM, newSong.getAlbum());
         songValues.put(COLUMN_SONGS_YEAR, newSong.getYear());
+
         database.insert(SONG_TABLE, null, songValues);
         database.close();
     }
-
-
 
     //------End CRUD Methods------//
 
