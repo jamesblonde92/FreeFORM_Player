@@ -1,7 +1,6 @@
 package com.flynn.jake.freeformplayer;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -29,7 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.flynn.jake.freeformplayer.database.MediaDataSource;
 import com.flynn.jake.freeformplayer.models.Song;
-import java.lang.reflect.Array;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -166,6 +165,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         //---------------------External storage search---------------------
         genereSearch();
+
+        mDataSource.removeAllDataFromTable();
 
         Uri intUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         updateList(intUri);
@@ -486,7 +487,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             mDataSource.close();
         }catch (Exception e)
         {
-            //Toast.makeText(MainActivity.this, "Didnt stop", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Didnt destroy", Toast.LENGTH_SHORT).show();
         }
     }
 

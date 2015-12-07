@@ -26,7 +26,6 @@ public class MediaDataSource extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "media.db";
     private static final int DB_VERSION = 1;
-    private static String DB_PATH = "";
     private Context mContext;
     private SQLiteDatabase mDatabase;
 
@@ -50,16 +49,17 @@ public class MediaDataSource extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-            String cmd = "CREATE TABLE " + SONG_TABLE + "(" +
-                    "SongSKU" + " TEXT," +
-                    COLUMN_SONGS_NAME + " TEXT," +
-                    COLUMN_SONGS_GENRE + " TEXT," +
-                    COLUMN_SONGS_ARTIST + " TEXT," +
-                    COLUMN_SONGS_ALBUM + " TEXT," +
-                    COLUMN_SONGS_YEAR + " INTEGER," +
-                    COLUMN_SONG_URI + " TEXT)";
 
-            db.execSQL(cmd);
+        String cmd = "CREATE TABLE " + SONG_TABLE + "(" +
+                "SongSKU" + " TEXT," +
+                COLUMN_SONGS_NAME + " TEXT," +
+                COLUMN_SONGS_GENRE + " TEXT," +
+                COLUMN_SONGS_ARTIST + " TEXT," +
+                COLUMN_SONGS_ALBUM + " TEXT," +
+                COLUMN_SONGS_YEAR + " INTEGER," +
+                COLUMN_SONG_URI + " TEXT)";
+
+        db.execSQL(cmd);
     }
 
     @Override
@@ -71,6 +71,12 @@ public class MediaDataSource extends SQLiteOpenHelper {
 
     //------CRUD Methods------//
 
+
+    public void removeAllDataFromTable(){
+        SQLiteDatabase database = this.getWritableDatabase();
+        database.execSQL("delete from " + SONG_TABLE);
+        database.close();
+    }
 
     public ArrayList<Song> readSong(){
         SQLiteDatabase database = this.getWritableDatabase();
@@ -149,8 +155,8 @@ public class MediaDataSource extends SQLiteOpenHelper {
 
     public void addSong(Song newSong) {
         SQLiteDatabase database = this.getWritableDatabase();
-
         // Implementations details
+
         ContentValues songValues = new ContentValues();
         songValues.put(COLUMN_SONGS_NAME, newSong.getName());
         songValues.put("SongSKU", "" + newSong.getSongID());
