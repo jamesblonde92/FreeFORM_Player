@@ -45,7 +45,7 @@ public class MediaDataSource extends SQLiteOpenHelper {
 
     public MediaDataSource(Context context){
         super(context, DB_NAME, null, DB_VERSION);
-        
+
     }
 
     @Override

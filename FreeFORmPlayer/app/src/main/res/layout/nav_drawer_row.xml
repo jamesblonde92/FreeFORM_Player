@@ -6,7 +6,7 @@
     android:id="@+id/nav_drawer_row"
     android:paddingLeft="2dp"
     android:contextClickable="false"
-    android:background="@android:color/black"
+    android:background="#FFF8E1"
     android:gravity="center_vertical|center_horizontal|fill"
     android:textAlignment="center">
 
@@ -15,10 +15,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView_icon"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentLeft="false"
         android:layout_marginLeft="0dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="0dp" />
+        android:layout_marginTop="0dp"
+        android:layout_alignParentRight="true"
+        android:padding="2dp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -27,16 +29,10 @@
         android:id="@+id/textView_Drawer_Name"
         android:layout_gravity="center_horizontal"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/imageView_icon"
-        android:layout_toEndOf="@+id/imageView_icon"
-        android:textColor="#ffffff"
+        android:textColor="#111"
         android:gravity="center_vertical|center"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:padding="2dp"/>
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="200px">
-    </LinearLayout>
 
 </RelativeLayout>
