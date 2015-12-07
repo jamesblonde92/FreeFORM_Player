@@ -7,5 +7,7 @@
     <string name="next">Next</string>
     <string name="prev">Prev</string>
     <string name="pause">Pause</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
 
 </resources>

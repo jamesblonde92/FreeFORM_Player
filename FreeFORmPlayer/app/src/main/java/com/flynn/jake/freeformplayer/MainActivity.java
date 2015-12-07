@@ -49,10 +49,13 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     ActionBarDrawerToggle mDrawerToggle;
     private RelativeLayout mPlayControls;
     private ArrayList<Song> songList = new ArrayList<>();
-    private ArrayList<Song> tempSongList = new ArrayList<>();
     private MediaPlayer mPlayer;
-    private static final String OPEN_DRAWER = "Drawer closed";
-    private static final String CLOSED_DRAWER = "Drawer open";
+    private String OPEN_DRAWER = "All Songs";
+    private String CLOSED_DRAWER = "Menu";
+
+    private final int SONGS_DISPLAYED = 0;
+    private final int ARTISTS_DISPLAYED = 1;
+    private final int GENRES_DISPLAYED = 2;
 
     private ImageButton mPlay;
     private ImageButton mPrev;
@@ -63,9 +66,15 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     protected MediaDataSource mDataSource;
     private int mPrevPosition;
     private int mNextPosition;
-    private boolean mArtistsDisplayed = false;
+    private int mCategoryDisplayed = SONGS_DISPLAYED;
+
+    private String mDrawerTitle;
+    private String mTitle;
+
+
 
     private HashMap mGenreMap = new HashMap<String, String>();
+    private String mSubCatagory = "All Songs";
 
     //----------EndVariables----------//
 
@@ -95,9 +104,38 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mDrawerItemArrayList = new ArrayList<DrawerItem>();
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.all_songs, " All Songs"));
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.artist, " Artist"));
-        mDrawerItemArrayList.add(new DrawerItem(R.drawable.now_playing, " Now Playing"));
+        mDrawerItemArrayList.add(new DrawerItem(R.drawable.now_playing, " Genre"));
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.settings, " Settings"));
         mDrawerItemArrayList.trimToSize();
+
+
+        //Anonymous inner class dealing with opening and closing the navDrawer
+        mDrawerTitle = "Select an option:";
+        mTitle = "Closed";
+        mTitle = mDrawerTitle =(String) getTitle();
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                setTitle(mTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                setTitle("Select an option:");
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+
+        // Set the drawer toggle as the DrawerListener
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mDrawerToggle.syncState();
+
         //-------------End initialize--------------
 
 
@@ -137,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         Uri extUri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
         updateList(extUri);
 
+        populateSongListWithSongs();
 
         //------------list view adapter------------------
 
@@ -165,19 +204,30 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
                     case 0:
-                        Toast.makeText(MainActivity.this, "nav drawer item 1", Toast.LENGTH_SHORT).show();
-
+                        populateSongListWithSongs();
+                        mCategoryDisplayed = SONGS_DISPLAYED;
+                        OPEN_DRAWER = "All Songs";
+                        mSubCatagory = "All Songs";
+                        mDrawerLayout.closeDrawers();
                         break;
                     case 1:
                         ////ToDo:
                         //Add in logic to only display artist names in the list
-                        mArtistsDisplayed = true;
+                        populateSongListWithCategory("ArtistName");
+                        OPEN_DRAWER = "Artists";
+                        mCategoryDisplayed = ARTISTS_DISPLAYED;
+                        mDrawerLayout.closeDrawers();
+
                         break;
                     case 2:
-                        Toast.makeText(MainActivity.this, "nav drawer item 3", Toast.LENGTH_SHORT).show();
+                        populateSongListWithCategory("GenreName");
+                        OPEN_DRAWER = "Genres";
+                        mCategoryDisplayed = GENRES_DISPLAYED;
+                        mDrawerLayout.closeDrawers();
                         break;
                     case 3:
                         Toast.makeText(MainActivity.this, "nav drawer item 4", Toast.LENGTH_SHORT).show();
+                        mDrawerLayout.closeDrawers();
                         break;
                 }
             }
@@ -200,6 +250,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mDrawerToggle.syncState();
+
         //-----------------End nav drawer----------------------
 
 
@@ -251,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 mPlayer.stop();
                 mPlayer.reset();
                 //mPlayer = new MediaPlayer();
-                if (!(mPrevPosition < 0)) {
+                if (!(mPrevPosition < 0) && !(mPrevPosition > songList.size())) {
                     setMediaPlayer(mPlayer, mPrevPosition);
                     mNextPosition--;
                     mPrevPosition--;
@@ -263,8 +315,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                     mNextPosition = 1;
                     setMediaPlayer(mPlayer, mPrevPosition);
                 }
-                mPlayer.start();
 
+                mPlayer.start();
                 mListView.smoothScrollToPosition(mNextPosition-1);
 
             }
@@ -367,7 +419,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                     if (mGenreMap.containsKey(thisTitle))
                         thisGenre = (String) mGenreMap.get(thisTitle);
                     else
-                        thisGenre = null;
+                        thisGenre = "Unknown";
                     Song newSong = new Song(thisId, thisTitle, thisGenre, thisArtist, thisAlbum,  thisYear, inURI);
                     songList.add(newSong);
                     mediaDataSource.addSong(newSong);
@@ -383,15 +435,38 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
     protected void onResume() {
         super.onResume();
+    }
+
+    private void populateSongListWithSongs(){
+        MediaDataSource dataSource = new MediaDataSource(this.getApplicationContext());
+
+        songList = dataSource.readSong();
+
+        ArrayAdapter<Song> songArrayAdapter = new ArrayAdapter<Song>(
+                this,
+                android.R.layout.simple_list_item_1,
+                songList);
+        mListView.setAdapter(songArrayAdapter);
+    }
+
+    private void populateSongListWithCategory(String categoryKeyword){
+        MediaDataSource dataSource = new MediaDataSource(this.getApplicationContext());
+
+        ArrayList<String> tempArtistList = dataSource.readCategory(categoryKeyword);
+
+
+        ArrayAdapter<String> songArrayAdapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_list_item_1,
+                tempArtistList);
+        mListView.setAdapter(songArrayAdapter);
+    }
+
+    private void populateSongListWithSongsFromCategory(String category, String keyword){
 
         MediaDataSource dataSource = new MediaDataSource(this.getApplicationContext());
 
-        tempSongList = dataSource.readSong();
-
-        songList = new ArrayList<Song>();
-        for (Song s : tempSongList) {
-            songList.add(s);
-        }
+        songList = dataSource.readSongFromCategory(category, keyword);
 
         ArrayAdapter<Song> songArrayAdapter = new ArrayAdapter<Song>(
                 this,
@@ -402,8 +477,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
     protected void onPause() {
         super.onPause();
-
-        //mDataSource.close();
     }
 
     @Override
@@ -413,6 +486,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         try{
             mPlayer.stop();
             mPlayer.release();
+            mDataSource.close();
         }catch (Exception e)
         {
             //Toast.makeText(MainActivity.this, "Didnt stop", Toast.LENGTH_SHORT).show();
@@ -441,6 +515,8 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if (mDrawerToggle.onOptionsItemSelected(item)) return true;
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Toast.makeText(MainActivity.this, "Made by Jake Flynn, Shane Olson, and James Reisenauer", Toast.LENGTH_SHORT).show();
@@ -460,9 +536,24 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        if(mArtistsDisplayed == true){
+        if(mCategoryDisplayed == ARTISTS_DISPLAYED){
             //// TODO:
             //Add in logic to handle if a artist is clicked
+            String artistNameKeyword=(String)parent.getItemAtPosition(position);
+
+            populateSongListWithSongsFromCategory("ArtistName", "'"+ artistNameKeyword +"'");
+            getSupportActionBar().setTitle(artistNameKeyword);
+            mCategoryDisplayed = SONGS_DISPLAYED;
+        }
+
+        else if(mCategoryDisplayed == GENRES_DISPLAYED){
+            //// TODO:
+            //Add in logic to handle if a artist is clicked
+            String genreNameKeyword = (String) parent.getItemAtPosition(position);
+
+            populateSongListWithSongsFromCategory("GenreName", "'" + genreNameKeyword + "'");
+            getSupportActionBar().setTitle(genreNameKeyword);
+            mCategoryDisplayed = SONGS_DISPLAYED;
         }
 
         else {
