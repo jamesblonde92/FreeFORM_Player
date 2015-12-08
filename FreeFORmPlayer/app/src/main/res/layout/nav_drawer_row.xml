@@ -3,8 +3,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingTop="24dp"
     android:id="@+id/nav_drawer_row"
-    android:paddingLeft="2dp"
     android:contextClickable="false"
     android:background="#FFF8E1"
     android:gravity="center_vertical|center_horizontal|fill"
@@ -12,27 +12,29 @@
 
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:id="@+id/imageView_icon"
-        android:layout_alignParentLeft="false"
-        android:layout_marginLeft="0dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="0dp"
-        android:layout_alignParentRight="true"
-        android:padding="2dp"/>
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"/>
 
     <TextView
+        android:layout_height="48dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/textView_Drawer_Name"
         android:layout_gravity="center_horizontal"
         android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
         android:textColor="#111"
-        android:gravity="center_vertical|center"
-        android:textAlignment="center"
-        android:padding="2dp"/>
+        android:layout_marginLeft="56dp"
+        android:layout_marginTop="12dp"
+        android:layout_alignParentLeft="true"
+        />
 
 
 </RelativeLayout>
