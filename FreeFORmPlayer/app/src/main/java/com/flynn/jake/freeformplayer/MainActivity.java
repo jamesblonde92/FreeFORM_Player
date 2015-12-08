@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -61,6 +62,9 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private ImageButton mPlay;
     private ImageButton mPrev;
     private ImageButton mNext;
+    private ImageButton mLoop;
+    private boolean isLooping = false;
+
     private TextView mSeekTimer;
     private TextView mDuration;
 
@@ -105,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mPlay = (ImageButton) findViewById(R.id.button_play);
         mNext = (ImageButton) findViewById(R.id.button_next);
         mPrev = (ImageButton) findViewById(R.id.button_prev);
+        mLoop = (ImageButton) findViewById(R.id.loopButtonOff);
 
         mSeekTimer = (TextView) findViewById(R.id.seekTimer);
         mDuration = (TextView) findViewById(R.id.durationText);
@@ -264,9 +269,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         //-----------------ButtonListeners---------------------
 
-        //mPlayControls.sj
-
-
         mPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -330,6 +332,20 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
             }
         });
 
+        mLoop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isLooping)
+                {
+                    isLooping = false;
+                    mLoop.setAlpha(new Float(1.0));
+                }else {
+                    isLooping = true;
+                    mLoop.setAlpha(new Float(.0));
+                }
+            }
+        });
+
 
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             public void onCompletion(MediaPlayer mp) {
@@ -337,17 +353,33 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 mPlay.setAlpha(new Float(.0));
                 mPlayer.stop();
                 mPlayer.reset();
-                setMediaPlayer(mPlayer, mNextPosition);
+                if (isLooping) {
+                    setMediaPlayer(mPlayer, mNextPosition-1);
+                }else {
+                    setMediaPlayer(mPlayer, mNextPosition);
+                    mNextPosition++;
+                    mPrevPosition++;
+                }
                 mPlayer.start();
-                mNextPosition++;
-                mPrevPosition++;
                 mListView.smoothScrollToPosition(mNextPosition-1);
 
                 if(mNextPosition == songList.size()){
                     mNextPosition = 0;
+                }else if (mNextPosition < 0){
+                    mNextPosition = songList.size()-1;
+                }else{
+                    //Log.i("Issue in: ", "onCompletion Previous");
                 }
+
+
                 if(mPrevPosition == songList.size()){
                     mPrevPosition = 0;
+                }else if (mPrevPosition < 0)
+                {
+                    mPrevPosition = songList.size()-1;
+                }
+                else {
+                    //Log.i("Issue in: ", "onCompletion Previous");
                 }
             }
         });
