@@ -12,15 +12,18 @@
     android:orientation="vertical">
     <ListView
 
-        android:layout_height="0dp"
+        android:layout_height="48dp"
         android:id="@+id/listView_songs"
         android:choiceMode="multipleChoiceModal"
         android:layout_weight="4"
-        android:textSize="20sp"
+        android:textSize="24sp"
         android:layout_width="fill_parent"
         android:background="#FFF8E1"
         android:smoothScrollbar="true"
-        android:textAlignment="center" />
+        android:divider="#00ffffff"
+        android:textFilterEnabled="false"
+        android:paddingLeft="16dp"
+        />
 
     <RelativeLayout
         android:orientation="horizontal"
@@ -100,23 +103,23 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:id="@+id/loopButtonOn"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
             android:clickable="true"
-            android:layout_alignParentStart="true"
             android:src="@drawable/ic_loop_white_48dp"
-            android:background="@android:color/transparent"/>
+            android:background="@android:color/transparent"
+            android:layout_below="@+id/seekBar"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
 
         <ImageButton
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:id="@+id/loopButtonOff"
             android:clickable="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:src="@drawable/ic_loop_black_48dp"
-            android:background="@android:color/transparent"/>
+            android:background="@android:color/transparent"
+            android:layout_below="@+id/seekBar"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
 
         <SeekBar
             android:layout_width="300dp"
@@ -130,6 +133,35 @@
             android:splitTrack="false"
             android:progressTint="#e82424"
             android:progressTintMode="src_over" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="00:00"
+            android:id="@+id/seekTimer"
+            android:foregroundGravity="center"
+            android:gravity="center"
+            android:layout_alignParentTop="true"
+            android:paddingTop="7.5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:paddingLeft="8dp"
+            android:layout_alignRight="@+id/loopButtonOn"
+            android:layout_alignEnd="@+id/loopButtonOn"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="00:00"
+            android:id="@+id/durationText"
+            android:layout_alignBottom="@+id/seekTimer"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_toRightOf="@+id/button_next"
+            android:layout_toEndOf="@+id/button_next"
+            android:gravity="center"/>
 
     </RelativeLayout>
 

@@ -26,6 +26,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.Handler;
 import com.flynn.jake.freeformplayer.database.MediaDataSource;
 import com.flynn.jake.freeformplayer.models.Song;
 
@@ -60,8 +61,11 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     private ImageButton mPlay;
     private ImageButton mPrev;
     private ImageButton mNext;
+    private TextView mSeekTimer;
+    private TextView mDuration;
 
     private SeekBar mSeekBar;
+    private Handler mHandler = new Handler();
 
     protected MediaDataSource mDataSource;
     private int mPrevPosition;
@@ -102,13 +106,15 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mNext = (ImageButton) findViewById(R.id.button_next);
         mPrev = (ImageButton) findViewById(R.id.button_prev);
 
+        mSeekTimer = (TextView) findViewById(R.id.seekTimer);
+        mDuration = (TextView) findViewById(R.id.durationText);
+
         mDrawerItemArrayList = new ArrayList<DrawerItem>();
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.all_songs, " All Songs"));
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.artist, " Artist"));
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.now_playing, " Genre"));
         mDrawerItemArrayList.add(new DrawerItem(R.drawable.settings, " Settings"));
         mDrawerItemArrayList.trimToSize();
-
 
         //Anonymous inner class dealing with opening and closing the navDrawer
         mDrawerTitle = "Select an option:";
@@ -149,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
                 if(fromUser) {
                     mPlayer.seekTo(mPlayer.getDuration() * progress / 100);
+                    mSeekTimer.setText("" + Utilities.milliSecondsToTimer(mPlayer.getCurrentPosition()));
                 }
             }
 
@@ -257,6 +264,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         //-----------------ButtonListeners---------------------
 
         //mPlayControls.sj
+
 
         mPlay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -620,6 +628,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                             idNumber);
                     player.setDataSource(getApplicationContext(), trackUri);
                     player.prepare();
+
                 } catch (Exception t) {
                     //Toast.makeText(MainActivity.this, "prepare catch", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
@@ -628,7 +637,33 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         }
         setSongName(position);
         mSeekBar.setProgress(0);
+        mDuration.setText("" + Utilities.milliSecondsToTimer(player.getDuration()));
+        updateProgressBar();
     }
+
+    public void updateProgressBar() {
+        mHandler.postDelayed(mUpdateTimeTask, 10);
+    }
+
+    /**
+     * Background Runnable thread
+     * */
+    private Runnable mUpdateTimeTask = new Runnable() {
+        public void run() {
+            long totalDuration = mPlayer.getDuration();
+            long currentDuration = mPlayer.getCurrentPosition();
+
+            mSeekTimer.setText(""+Utilities.milliSecondsToTimer(currentDuration));
+
+            // Updating progress bar
+            int progress = (int)(Utilities.getProgressPercentage(currentDuration, totalDuration));
+            //Log.d("Progress", ""+progress);
+            mSeekBar.setProgress(progress);
+
+            // Running this thread after 100 milliseconds
+            mHandler.postDelayed(this, 100);
+        }
+    };
 
     public Context getActivity() {
         return mActivity;
