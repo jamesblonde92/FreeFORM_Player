@@ -64,7 +64,6 @@
             android:id="@+id/button_play"
             android:gravity="center"
             android:textAlignment="center"
-
             android:src="@drawable/ic_play_arrow_white_48dp"
             android:background="@drawable/roundedbutton"
             android:layout_below="@+id/seekBar"
@@ -131,7 +130,7 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:splitTrack="false"
-            android:progressTint="#e82424"
+            android:progressTint="#009688"
             android:progressTintMode="src_over" />
 
         <TextView
