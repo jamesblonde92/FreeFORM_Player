@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
         //-------------SeekBar--------------------
         mSeekBar = (SeekBar) findViewById(R.id.seekBar);
+        mSeekBar.setProgress(0);
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -645,9 +646,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         mHandler.postDelayed(mUpdateTimeTask, 10);
     }
 
-    /**
-     * Background Runnable thread
-     * */
+
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
             long totalDuration = mPlayer.getDuration();
@@ -655,12 +654,9 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
             mSeekTimer.setText(""+Utilities.milliSecondsToTimer(currentDuration));
 
-            // Updating progress bar
             int progress = (int)(Utilities.getProgressPercentage(currentDuration, totalDuration));
-            //Log.d("Progress", ""+progress);
             mSeekBar.setProgress(progress);
 
-            // Running this thread after 100 milliseconds
             mHandler.postDelayed(this, 100);
         }
     };
