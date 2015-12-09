@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         //---------------------External storage search---------------------
         genereSearch();
 
-        mDataSource.removeAllDataFromTable();
+        //mDataSource.removeAllDataFromTable();
 
         Uri intUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         updateList(intUri);
